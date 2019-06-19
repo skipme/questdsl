@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "questdsl", "questdsl\questdsl.csproj", "{F46CD251-BBE7-4FC1-81DF-42C3F3D6905F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qdsl_tests", "questdsl_tests\qdsl_tests.csproj", "{322CF3BF-DFDF-451B-BAF8-3E5938812721}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F46CD251-BBE7-4FC1-81DF-42C3F3D6905F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F46CD251-BBE7-4FC1-81DF-42C3F3D6905F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F46CD251-BBE7-4FC1-81DF-42C3F3D6905F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F46CD251-BBE7-4FC1-81DF-42C3F3D6905F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{322CF3BF-DFDF-451B-BAF8-3E5938812721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{322CF3BF-DFDF-451B-BAF8-3E5938812721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{322CF3BF-DFDF-451B-BAF8-3E5938812721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{322CF3BF-DFDF-451B-BAF8-3E5938812721}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98A49DF9-3D9D-48C9-A4D8-E75D0E2E4A6F}
+	EndGlobalSection
+EndGlobal
