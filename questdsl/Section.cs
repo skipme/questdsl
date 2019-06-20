@@ -16,12 +16,17 @@ namespace questdsl
         {
             ProbesOr = probes;
             Body = body;
+            if (body == null || body.Count == 0)
+                throw new Exception();
 
             IsSubStateModifies = modifiesTo().Any();
         }
 
         public IEnumerable<string> dependentOn()
         {
+            if (ProbesOr == null)
+                yield break;
+
             foreach (var item in ProbesOr)
             {
                 if (item.ExLeftPart.TypeValue == ExpressionValue.ValueType.SubstateName)
@@ -34,7 +39,7 @@ namespace questdsl
                 else if (item.ExRightPart.TypeValue == ExpressionValue.ValueType.StateRef_SubstateRef)
                     yield return $"{item.ExRightPart.Left}.*";
             }
-            yield break;
+            
         }
         public IEnumerable<string> modifiesTo()
         {

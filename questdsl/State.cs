@@ -17,6 +17,9 @@ namespace questdsl
 
         public void AddSubstate(string name, ExpressionValue defaultValue)
         {
+            if (name == null)
+                name = (Guid.NewGuid().ToString().Substring(0, 4));
+
             ExpressionSubStateDefinition sub = new ExpressionSubStateDefinition(this.Name, name, defaultValue);
             if (SubstatesBook.ContainsKey(name))
                 throw new Exception();

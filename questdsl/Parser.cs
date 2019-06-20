@@ -168,7 +168,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
         }
         public PartType EvaluatePartType(string line, Dictionary<string, string> parserGroups)
         {
-            Match m = Regex.Match(line, @"^(\w+)\.(\w+)$|^(\w+)\.\$(\w+)$|^\$(\w+)\.(\w+)$|^\$(\w+)\.\$(\w+)$|^(\d+)$|^""(.*)""$|^""(.*)[^""]$|^[^""](.*)""$");
+            Match m = Regex.Match(line, @"^(\w+)\.(\w+)$|^(\w+)\.\$(\w+)$|^\$(\w+)\.(\w+)$|^\$(\w+)\.\$(\w+)$|^(\d+)$|^""(.*)""$|^""(.*[^""])$|^([^""].*)""$");
             if (m.Success)
             {
                 if (m.Groups[2].Success)
