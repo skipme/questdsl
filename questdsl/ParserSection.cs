@@ -26,6 +26,9 @@ namespace questdsl
             public readonly string NodeName;
             public State StateNodeInstance;
 
+            public List<ExpressionBool> ProbesOr;
+            public List<ExpressionExecutive> ExecBody;
+
             public bool HasSections;
             public bool SectionExecutionBody;
             public bool DeclaredSubstatesByName;
@@ -37,6 +40,7 @@ namespace questdsl
 
             public Dictionary<int, string> simlinks = new Dictionary<int, string>();
             public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
+            private bool IsBodyWithoutConditionOccuredBefore;
 
             public void AddSimlink(int argnum, string name)
             {
@@ -121,6 +125,48 @@ namespace questdsl
                     return AccumulatedMultivar != null;
                 }
             }
+            public void PushCondition(ExpressionBool expression)
+            {
+                if (NodeDeclaredType != NodeType.Transition
+                    & NodeDeclaredType != NodeType.Trigger
+                    & NodeDeclaredType != NodeType.undeclared)
+                {
+                    throw new Exception();
+                }
+                if (ExecBody != null)
+                    throw new Exception();
+
+                if (ProbesOr == null)
+                    ProbesOr = new List<ExpressionBool>();
+
+                ProbesOr.Add(expression);
+
+                if (NodeDeclaredType == NodeType.undeclared)
+                {
+                    NodeDeclaredType = NodeType.Trigger;
+                }
+            }
+            public void PushExec(ExpressionExecutive expression)
+            {
+                if (NodeDeclaredType != NodeType.Transition
+                    & NodeDeclaredType != NodeType.Trigger
+                    & NodeDeclaredType != NodeType.undeclared)
+                {
+                    throw new Exception();
+                }
+                if (IsBodyWithoutConditionOccuredBefore && ProbesOr == null)
+                    throw new Exception();
+
+                if (ExecBody == null)
+                    ExecBody = new List<ExpressionExecutive>();
+
+                ExecBody.Add(expression);
+
+                if (NodeDeclaredType == NodeType.undeclared)
+                {
+                    NodeDeclaredType = NodeType.Trigger;
+                }
+            }
             public void MakeTransition()
             {
 
@@ -185,6 +231,35 @@ namespace questdsl
                     }
                     break;
                 case LineType.condition:
+                    ExpressionBool.Operation op;
+                    switch (parsedParts["cond"])
+                    {
+                        case "==":
+                            op = ExpressionBool.Operation.eq;
+                            break;
+                        case "!=":
+                            op = ExpressionBool.Operation.neq;
+                            break;
+                        case "<":
+                            op = ExpressionBool.Operation.lt;
+                            break;
+                        case ">":
+                            op = ExpressionBool.Operation.bt;
+                            break;
+                        case ">=":
+                            op = ExpressionBool.Operation.bteq;
+                            break;
+                        case "<=":
+                            op = ExpressionBool.Operation.lteq;
+                            break;
+                        default:
+                            throw new Exception();
+                            break;
+                    }
+                    ExpressionValue leftVal = ParseValue(parsedParts["left"]);
+                    ExpressionValue rightVal = ParseValue(parsedParts["right"]);
+                    ExpressionBool cond = new ExpressionBool(op, leftVal, rightVal);
+                    context.PushCondition(cond);
                     break;
                 case LineType.executive:
                     break;
@@ -236,20 +311,39 @@ namespace questdsl
             }
         }
 
-        private ExpressionValue ParseValue(string v)
+        public ExpressionValue ParseValue(string v)
         {
             Dictionary<string, string> groups = new Dictionary<string, string>();
             PartType pt = this.EvaluatePartType(v, groups);
-            if (pt == PartType.text_string
-                || pt == PartType.text_multiline)
+
+            switch (pt)
             {
-                return new ExpressionValue(ExpressionValue.ValueType.string_text, groups["string"]);
+                case PartType.substate:
+                    return new ExpressionValue(ExpressionValue.ValueType.SubstateName, groups["left"], groups["right"]);
+                    break;
+                case PartType.substate_subVar:
+                    return new ExpressionValue(ExpressionValue.ValueType.StateName_SubstateRef, groups["left"], groups["right"]);
+                    break;
+                case PartType.substate_stateVar:
+                    return new ExpressionValue(ExpressionValue.ValueType.StateRef_SubstateName, groups["left"], groups["right"]);
+                    break;
+                case PartType.substate_allVar:
+                    return new ExpressionValue(ExpressionValue.ValueType.StateRef_SubstateRef, groups["left"], groups["right"]);
+                    break;
+                case PartType.digit:
+                    return new ExpressionValue(ExpressionValue.ValueType.number, null, null, int.Parse(groups["number"]));
+                    break;
+                case PartType.text_string:
+                case PartType.text_multiline:
+                    return new ExpressionValue(ExpressionValue.ValueType.string_text, groups["string"]);
+                    break;
+                case PartType.text_multiline_start:
+                case PartType.text_multiline_end:
+                default:
+                    throw new Exception();
+                    break;
             }
 
-            if (pt == PartType.digit)
-            {
-                return new ExpressionValue(ExpressionValue.ValueType.string_text, null, null, int.Parse(groups["number"]));
-            }
 
             return null;
         }

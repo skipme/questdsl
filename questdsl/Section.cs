@@ -11,7 +11,7 @@ namespace questdsl
         public List<ExpressionBool> ProbesOr;
         public List<ExpressionExecutive> Body;
 
-
+        
         public Section(List<ExpressionBool> probes, List<ExpressionExecutive> body)
         {
             ProbesOr = probes;
@@ -39,13 +39,13 @@ namespace questdsl
                 else if (item.ExRightPart.TypeValue == ExpressionValue.ValueType.StateRef_SubstateRef)
                     yield return $"{item.ExRightPart.Left}.*";
             }
-            
+
         }
         public IEnumerable<string> modifiesTo()
         {
             foreach (var item in Body)
             {
-                if(item.SubStateModifies)
+                if (item.SubStateModifies)
                 {
                     //foreach (var item in item.)
                     //{

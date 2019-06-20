@@ -58,6 +58,8 @@ namespace questdsl_tests
 
             Assert.IsTrue(string.CompareOrdinal(p.context.StateNodeInstance.Substates[2].initialValue.Left, "multilineStart\r\nintermediate\"xxx\r\nintermediate") == 0);
 
+
+
         }
         [Test]
         public void TestSimlink()
