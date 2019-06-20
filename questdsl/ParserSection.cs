@@ -231,37 +231,67 @@ namespace questdsl
                     }
                     break;
                 case LineType.condition:
-                    ExpressionBool.Operation op;
-                    switch (parsedParts["cond"])
                     {
-                        case "==":
-                            op = ExpressionBool.Operation.eq;
-                            break;
-                        case "!=":
-                            op = ExpressionBool.Operation.neq;
-                            break;
-                        case "<":
-                            op = ExpressionBool.Operation.lt;
-                            break;
-                        case ">":
-                            op = ExpressionBool.Operation.bt;
-                            break;
-                        case ">=":
-                            op = ExpressionBool.Operation.bteq;
-                            break;
-                        case "<=":
-                            op = ExpressionBool.Operation.lteq;
-                            break;
-                        default:
-                            throw new Exception();
-                            break;
+                        ExpressionBool.Operation op;
+                        switch (parsedParts["cond"])
+                        {
+                            case "==":
+                                op = ExpressionBool.Operation.eq;
+                                break;
+                            case "!=":
+                                op = ExpressionBool.Operation.neq;
+                                break;
+                            case "<":
+                                op = ExpressionBool.Operation.lt;
+                                break;
+                            case ">":
+                                op = ExpressionBool.Operation.bt;
+                                break;
+                            case ">=":
+                                op = ExpressionBool.Operation.bteq;
+                                break;
+                            case "<=":
+                                op = ExpressionBool.Operation.lteq;
+                                break;
+                            default:
+                                throw new Exception();
+                                break;
+                        }
+                        ExpressionValue leftVal = ParseValue(parsedParts["left"]);
+                        ExpressionValue rightVal = ParseValue(parsedParts["right"]);
+                        ExpressionBool cond = new ExpressionBool(op, leftVal, rightVal);
+                        context.PushCondition(cond);
                     }
-                    ExpressionValue leftVal = ParseValue(parsedParts["left"]);
-                    ExpressionValue rightVal = ParseValue(parsedParts["right"]);
-                    ExpressionBool cond = new ExpressionBool(op, leftVal, rightVal);
-                    context.PushCondition(cond);
                     break;
                 case LineType.executive:
+                    {
+                        ExpressionExecutive.ExecuteType op;
+                        switch (parsedParts["cond"])
+                        {
+                            case "+=":
+                                op = ExpressionExecutive.ExecuteType.Add;
+                                break;
+                            case "=":
+                                op = ExpressionExecutive.ExecuteType.Assign;
+                                break;
+                            case "--":
+                                op = ExpressionExecutive.ExecuteType.Decrement;
+                                break;
+                            case "++":
+                                op = ExpressionExecutive.ExecuteType.Increment;
+                                break;
+                            case "-=":
+                                op = ExpressionExecutive.ExecuteType.Subtract;
+                                break;
+                            default:
+                                throw new Exception();
+                                break;
+                        }
+                        ExpressionValue leftVal = ParseValue(parsedParts["left"]);
+                        ExpressionValue rightVal = ParseValue(parsedParts["right"]);
+                        ExpressionExecutive cond = new ExpressionExecutive(op, leftVal, rightVal);
+                        context.PushExec(cond);
+                    }
                     break;
                 case LineType.executive_invocation:
                     break;
@@ -334,8 +364,16 @@ namespace questdsl
                     return new ExpressionValue(ExpressionValue.ValueType.number, null, null, int.Parse(groups["number"]));
                     break;
                 case PartType.text_string:
+                    if (v.Trim() == "null")
+                        return new ExpressionValue(ExpressionValue.ValueType.Reference, "null");
+                    else
+                        return new ExpressionValue(ExpressionValue.ValueType.string_text, v);
+                    break;
                 case PartType.text_multiline:
                     return new ExpressionValue(ExpressionValue.ValueType.string_text, groups["string"]);
+                    break;
+                case PartType.variable:
+                    return new ExpressionValue(ExpressionValue.ValueType.Reference, groups["var"]);
                     break;
                 case PartType.text_multiline_start:
                 case PartType.text_multiline_end:

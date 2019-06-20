@@ -24,7 +24,8 @@ namespace questdsl
             Null,
             Arg,
             List,
-            Image
+            Image,
+            LocalVar
         }
         public string Left;
         public string Right;
@@ -74,8 +75,10 @@ namespace questdsl
                         }
                         else if (left == "null")
                             TypeOfReference = RefType.Null;
-                        else if (left == "$image")
+                        else if (left == "image")
                             TypeOfReference = RefType.Image;
+                        else
+                            TypeOfReference = RefType.LocalVar;
                     }
                     vars.Add(left);
 
@@ -93,6 +96,8 @@ namespace questdsl
                     vars.Add(right);
                     break;
                 case ValueType.string_text:
+                    if (left.TrimStart().StartsWith("$"))
+                        throw new Exception();
                     break;
                 case ValueType.number:
                     break;

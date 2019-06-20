@@ -160,7 +160,9 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
             text_string,
             text_multiline,         //"xxx"
             text_multiline_start,   //"...
-            text_multiline_end      //..."
+            text_multiline_end,     //..."
+
+            variable                //$xxx
         }
         public PartType EvaluatePartType(string line)
         {
@@ -168,7 +170,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
         }
         public PartType EvaluatePartType(string line, Dictionary<string, string> parserGroups)
         {
-            Match m = Regex.Match(line, @"^(\w+)\.(\w+)$|^(\w+)\.\$(\w+)$|^\$(\w+)\.(\w+)$|^\$(\w+)\.\$(\w+)$|^(\d+)$|^""(.*)""$|^""(.*[^""])$|^([^""].*)""$");
+            Match m = Regex.Match(line, @"^\s*(\w+)\.(\w+)\s*$|^\s*(\w+)\.\$(\w+)\s*$|^\s*\$(\w+)\.(\w+)\s*$|^\s*\$(\w+)\.\$(\w+)\s*$|^\s*(\d+)\s*$|^\s*""(.*)""\s*$|^""(.*[^""])$|^([^""].*)""$|^\s*\$(\w+)$");
             if (m.Success)
             {
                 if (m.Groups[2].Success)
@@ -238,6 +240,14 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                         parserGroups.Add("string", m.Groups[12].Value);
                     }
                     return PartType.text_multiline_end;
+                }
+                if (m.Groups[13].Success)
+                {
+                    if (parserGroups != null)
+                    {
+                        parserGroups.Add("var", m.Groups[13].Value);
+                    }
+                    return PartType.variable;
                 }
             }
             return PartType.text_string;

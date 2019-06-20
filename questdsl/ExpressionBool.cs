@@ -24,6 +24,12 @@ namespace questdsl
             ExOperation = op;
             ExLeftPart = left;
             ExRightPart = right;
+
+            if (left.TypeOfReference == ExpressionValue.RefType.NotReferred
+                && right.TypeOfReference == ExpressionValue.RefType.NotReferred)
+            {
+                throw new System.Exception();
+            }
         }
         public IEnumerable<string> GetVars()
         {
