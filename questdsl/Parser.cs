@@ -77,7 +77,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
             if (string.IsNullOrWhiteSpace(line))
                 return LineType.empty;
 
-            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^=>!<\+-]+)\s*$|^([\w\.\$]+)\s*(=|\+=|-=)\s*([\w\.\$]+)$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)(\s+.*)*$");
+            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^=>!<\+-]+)\s*$|^\s*([^=>!<\+-]+)\s*(=|\+=|-=)\s*([^=>!<\+-]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)(\s+.*)*$");
             if (m.Success)
             {
                 if (m.Groups[1].Success)
@@ -123,9 +123,9 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                 {
                     if (parserGroups != null)
                     {
-                        parserGroups.Add("left", m.Groups[10].Value);
+                        parserGroups.Add("left", m.Groups[10].Value.Trim());
                         parserGroups.Add("cond", m.Groups[11].Value);
-                        parserGroups.Add("right", m.Groups[12].Value);
+                        parserGroups.Add("right", m.Groups[12].Value.Trim());
                     }
                     return LineType.executive;
                 }
@@ -133,7 +133,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                 {
                     if (parserGroups != null)
                     {
-                        parserGroups.Add("left", m.Groups[13].Value);
+                        parserGroups.Add("left", m.Groups[13].Value.Trim());
                         parserGroups.Add("cond", m.Groups[14].Value);
                     }
                     return LineType.executive;

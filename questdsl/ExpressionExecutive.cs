@@ -29,8 +29,8 @@ namespace questdsl
             ToList,           // -->toList stateName (then substate values accessed by $list1, $list2...)
         }
         public ExecuteType FuncType;
-        public ExpressionValue Left;
-        public ExpressionValue Right;
+        public ExpressionValue ExLeftPart;
+        public ExpressionValue ExRightPart;
 
         public ExpressionExecutive(ExecuteType func, ExpressionValue left, ExpressionValue right)
         {
@@ -59,6 +59,11 @@ namespace questdsl
                     {
                         throw new Exception("");
                     }
+                    if(left.TypeValue == ExpressionValue.ValueType.number
+                        || left.TypeValue == ExpressionValue.ValueType.string_text)
+                    {
+                        throw new Exception("");
+                    }
                     if (func == ExecuteType.Add
                         || func == ExecuteType.Subtract)
                     {
@@ -78,8 +83,8 @@ namespace questdsl
             }
 
             FuncType = func;
-            Left = left;
-            Right = right;
+            ExLeftPart = left;
+            ExRightPart = right;
         }
     }
 }

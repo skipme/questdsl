@@ -14,6 +14,7 @@ namespace questdsl
             {
                 this.NodeName = NodeName;
                 StateNodeInstance = new State(NodeName);
+                Sections = new List<Section>();
             }
             public enum NodeType
             {
@@ -41,6 +42,7 @@ namespace questdsl
             public Dictionary<int, string> simlinks = new Dictionary<int, string>();
             public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
             private bool IsBodyWithoutConditionOccuredBefore;
+            private List<Section> Sections;
 
             public void AddSimlink(int argnum, string name)
             {
@@ -145,6 +147,7 @@ namespace questdsl
                 {
                     NodeDeclaredType = NodeType.Trigger;
                 }
+                this.SectionExecutionBody = false;
             }
             public void PushExec(ExpressionExecutive expression)
             {
@@ -154,7 +157,9 @@ namespace questdsl
                 {
                     throw new Exception();
                 }
-                if (IsBodyWithoutConditionOccuredBefore && ProbesOr == null)
+                if (HasSections && (ProbesOr == null || ProbesOr.Count == 0))
+                    throw new Exception();
+                if (!this.SectionExecutionBody && (HasSections || (ProbesOr != null && ProbesOr.Count > 0)))
                     throw new Exception();
 
                 if (ExecBody == null)
@@ -170,6 +175,36 @@ namespace questdsl
             public void MakeTransition()
             {
 
+            }
+
+            public void SectionSeparated()
+            {
+                if (ProbesOr == null || ProbesOr.Count == 0)
+                    throw new Exception();
+                if (this.SectionExecutionBody)
+                    throw new Exception();
+
+                this.SectionExecutionBody = true;
+            }
+
+            public void EmptyLineOccured()
+            {
+                if (!this.SectionExecutionBody && ProbesOr != null && ProbesOr.Count > 0)
+                    throw new Exception();
+                if (this.SectionExecutionBody && ExecBody != null && ExecBody.Count > 0)
+                    throw new Exception();
+
+
+                if (ProbesOr == null || ProbesOr.Count == 0)
+                {
+                    if (this.HasSections)
+                        throw new Exception();
+                }
+                this.Sections.Add(new Section(ProbesOr, ExecBody));
+                this.HasSections = true;
+                ProbesOr = null;
+                ExecBody = null;
+                this.SectionExecutionBody = false;
             }
         }
         public ParserContext context;
@@ -195,6 +230,7 @@ namespace questdsl
                     context.AddSimlink(int.Parse(parsedParts["arg"]), parsedParts["sim"]);
                     break;
                 case LineType.section_separator:
+                    context.SectionSeparated();
                     break;
                 case LineType.substate_declaration: // only for states
                     {
@@ -298,6 +334,7 @@ namespace questdsl
                 case LineType.comment:
                     break;
                 case LineType.empty:
+                    context.EmptyLineOccured();
                     break;
                 case LineType.undetermined:
                     if (context.IsInMultivar)

@@ -12,6 +12,35 @@ namespace questdsl_tests
     {
 
         [Test]
+        public void TestExecExpressions()
+        {
+            questdsl.Parser p = new questdsl.Parser();
+            Assert.Throws<Exception>(() => p.AppendLine("a=$c"));
+
+            p.AppendLine("$a= that is it ");
+            Assert.AreEqual(p.context.ExecBody.Count, 1);
+            Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.Left, "that is it");
+
+            Assert.Throws<Exception>(() => p.AppendLine("$a==$x"));
+            p.AppendLine("");
+            Assert.DoesNotThrow(() => p.AppendLine("$a==$x"));
+            Assert.Throws<Exception>(() => p.AppendLine(""));
+            Assert.Throws<Exception>(() => p.AppendLine("$m+=1"));
+            Assert.DoesNotThrow(() => p.AppendLine("----"));
+            Assert.Throws<Exception>(() => p.AppendLine("----"));
+            Assert.DoesNotThrow(() => p.AppendLine("$m+=1"));
+
+            p = new questdsl.Parser();
+            Assert.Throws<Exception>(() => p.AppendLine("$v = \"xxxx "));
+            Assert.Throws<Exception>(() => p.AppendLine("$v = xxxx\" "));
+            Assert.DoesNotThrow(() => p.AppendLine("$v = xxxx\"yyy "));
+            Assert.DoesNotThrow(() => p.AppendLine("$v = \"xxxxyyy\" "));
+
+        }
+
+        [Test]
         public void TestBoolExpressions()
         {
             questdsl.Parser p = new questdsl.Parser();
@@ -70,6 +99,11 @@ namespace questdsl_tests
             p.AppendLine("$c <= $param");
             Assert.AreEqual(p.context.ProbesOr.Count, 1);
             Assert.AreEqual(p.context.ProbesOr[0].ExOperation, questdsl.ExpressionBool.Operation.lteq);
+
+            Assert.Throws<Exception>(() => p.AppendLine("$a=$x"));
+            Assert.Throws<Exception>(() => p.AppendLine(""));
+            p.AppendLine("----");
+            Assert.DoesNotThrow(() => p.AppendLine("$a=$x"));
 
         }
     }
