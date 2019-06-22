@@ -1,0 +1,6 @@
+.vs/*
+questdsl/bin*
+questdsl/obj*
+packages/*
+questdsl_tests/bin*
+questdsl_tests/obj*

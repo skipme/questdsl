@@ -8,6 +8,26 @@ namespace questdsl
 {
     public partial class Parser
     {
+        public static State ParseNode(string name, string codeText)
+        {
+            Parser p = new Parser(name);
+            string[] lines = codeText.Split(
+                 new[] { "\r\n", "\r", "\n" },
+                 StringSplitOptions.None
+             );
+            for (int i = 0; i < lines.Length; i++)
+            {
+                //try
+                //{
+                p.AppendLine(lines[i]);
+                //}
+                //catch (Exception e)
+                //{
+                //    throw new Exception("at line " + i, e);
+                //}
+            }
+            return p.Product();
+        }
         public class ParserContext
         {
             public ParserContext(string NodeName)
@@ -41,8 +61,7 @@ namespace questdsl
 
             public Dictionary<int, string> simlinks = new Dictionary<int, string>();
             public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
-            private bool IsBodyWithoutConditionOccuredBefore;
-            private List<Section> Sections;
+            public List<Section> Sections;
 
             public void AddSimlink(int argnum, string name)
             {
@@ -67,30 +86,34 @@ namespace questdsl
                 if (this.DeclaredSubstatesByList && SubStateMultiline != "$$$$$")
                     throw new Exception();
 
-                if (substateName == null)
+                string keyName = substateName;
+
+                if (keyName == null)
                 {
                     if (SubStateMultiline == null)
                         throw new Exception();
-                    substateName = SubStateMultiline;
+                    keyName = SubStateMultiline;
                     SubStateMultiline = null;
                     if (Value == null)
                         throw new Exception();
                 }
                 if (Value != null)
                 {
-                    if (substateName == "$$$$$")
+                    if (keyName == "$$$$$")
                     {
                         this.DeclareListedSubstate(Value);
                     }
                     else
                     {
-                        StateNodeInstance.AddSubstate(substateName, Value);
+                        StateNodeInstance.AddSubstate(keyName, Value);
                     }
                 }
                 else
-                    SubStateMultiline = substateName;
+                    SubStateMultiline = keyName;
 
-                DeclaredSubstatesByName = true;
+                if (substateName != null)
+                    DeclaredSubstatesByName = true;
+
                 NodeDeclaredType = NodeType.State;
             }
             public void DeclareListedSubstate(ExpressionValue Value)
@@ -129,9 +152,7 @@ namespace questdsl
             }
             public void PushCondition(ExpressionBool expression)
             {
-                if (NodeDeclaredType != NodeType.Transition
-                    & NodeDeclaredType != NodeType.Trigger
-                    & NodeDeclaredType != NodeType.undeclared)
+                if (NodeDeclaredType == NodeType.State)
                 {
                     throw new Exception();
                 }
@@ -148,12 +169,14 @@ namespace questdsl
                     NodeDeclaredType = NodeType.Trigger;
                 }
                 this.SectionExecutionBody = false;
+                if (NodeDeclaredType != NodeType.Transition)
+                {
+                    NodeDeclaredType = NodeType.Trigger;
+                }
             }
             public void PushExec(ExpressionExecutive expression)
             {
-                if (NodeDeclaredType != NodeType.Transition
-                    & NodeDeclaredType != NodeType.Trigger
-                    & NodeDeclaredType != NodeType.undeclared)
+                if (NodeDeclaredType == NodeType.State)
                 {
                     throw new Exception();
                 }
@@ -167,14 +190,10 @@ namespace questdsl
 
                 ExecBody.Add(expression);
 
-                if (NodeDeclaredType == NodeType.undeclared)
+                if (NodeDeclaredType != NodeType.Transition)
                 {
                     NodeDeclaredType = NodeType.Trigger;
                 }
-            }
-            public void MakeTransition()
-            {
-
             }
 
             public void SectionSeparated()
@@ -189,9 +208,15 @@ namespace questdsl
 
             public void EmptyLineOccured()
             {
+                if (this.NodeDeclaredType == NodeType.State)
+                {
+                    if (this.IsInMultivar)
+                        this.AppendMultivar("");
+                    return;
+                }
                 if (!this.SectionExecutionBody && ProbesOr != null && ProbesOr.Count > 0)
                     throw new Exception();
-                if (this.SectionExecutionBody && ExecBody != null && ExecBody.Count > 0)
+                if (this.SectionExecutionBody && (ExecBody == null || ExecBody.Count == 0))
                     throw new Exception();
 
 
@@ -214,8 +239,23 @@ namespace questdsl
             context = new ParserContext(NodeName);
         }
 
-        public void CloseParser()
+        public State Product()
         {
+            if (context.NodeDeclaredType == ParserContext.NodeType.undeclared)
+                throw new Exception();
+
+            switch (context.NodeDeclaredType)
+            {
+                case ParserContext.NodeType.State:
+                    return context.StateNodeInstance;
+                case ParserContext.NodeType.Trigger:
+                    return new Transition(context.NodeName, true, context.Sections);
+                case ParserContext.NodeType.Transition:
+                    return new Transition(context.NodeName, false, context.Sections, context.simlinks);
+                default:
+                    throw new Exception();
+                    break;
+            }
 
         }
 
@@ -234,6 +274,9 @@ namespace questdsl
                     break;
                 case LineType.substate_declaration: // only for states
                     {
+                        if ("$$$$$" == parsedParts["substate"])
+                            throw new Exception();
+
                         Dictionary<string, string> groups = new Dictionary<string, string>();
                         PartType pt = this.EvaluatePartType(parsedParts["value"], groups);
                         ExpressionValue value = null;
@@ -247,7 +290,7 @@ namespace questdsl
                                 value = new ExpressionValue(ExpressionValue.ValueType.string_text, parsedParts["value"]);
                                 break;
                             case PartType.digit:
-                                value = new ExpressionValue(ExpressionValue.ValueType.string_text, null, null, int.Parse(groups["number"]));
+                                value = new ExpressionValue(ExpressionValue.ValueType.number, null, null, int.Parse(groups["number"]));
                                 break;
                             case PartType.text_multiline:
                                 value = new ExpressionValue(ExpressionValue.ValueType.string_text, groups["string"]);
@@ -355,6 +398,19 @@ namespace questdsl
                     }
                     else
                     {
+                        {
+                            string declaration = line.Trim().ToLower();
+                            {
+                                if (declaration == "trans" || declaration == "transition")
+                                {
+                                    if (context.NodeDeclaredType != ParserContext.NodeType.undeclared)
+                                        throw new Exception();
+                                    context.NodeDeclaredType = ParserContext.NodeType.Transition;
+                                    break;
+                                }
+                            }
+                        }
+
                         Dictionary<string, string> groups = new Dictionary<string, string>();
                         PartType pt = this.EvaluatePartType(line, groups);
                         if (pt == PartType.text_multiline_start)

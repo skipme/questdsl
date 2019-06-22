@@ -49,9 +49,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LineTypes.cs" />
+    <Compile Include="ParseClock.cs" />
     <Compile Include="ParseValues.cs" />
     <Compile Include="ParserSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ParseNodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\questdsl\questdsl.csproj">

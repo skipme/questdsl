@@ -38,6 +38,9 @@ namespace questdsl_tests
             Assert.DoesNotThrow(() => p.AppendLine("$v = xxxx\"yyy "));
             Assert.DoesNotThrow(() => p.AppendLine("$v = \"xxxxyyy\" "));
 
+            p = new questdsl.Parser();
+            p.AppendLine("trans");
+            Assert.AreEqual(p.context.NodeDeclaredType, questdsl.Parser.ParserContext.NodeType.Transition);
         }
 
         [Test]
