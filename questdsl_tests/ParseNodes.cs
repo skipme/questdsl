@@ -46,10 +46,52 @@ e: 11");
         [Test]
         public void TestTrigger()
         {
+            questdsl.State stx = questdsl.Parser.ParseNode("xxx",
+@"
+$assignment = uuo
+
+depend.sub == text
+----
+$localvar += 1
+depend.sub = $assignment
+");
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.Transition));
+            Assert.AreEqual((stx as questdsl.Transition).IsTrigger, true);
+            Assert.AreEqual((stx as questdsl.Transition).sections.Count, 2);
+            Assert.AreEqual((stx as questdsl.Transition).sections[0].ProbesOr, null);
+            Assert.AreEqual((stx as questdsl.Transition).sections[0].Body.Count, 1);
+
+            Assert.AreEqual((stx as questdsl.Transition).sections[1].ProbesOr.Count, 1);
+            Assert.AreEqual((stx as questdsl.Transition).sections[1].Body.Count, 2);
         }
         [Test]
         public void TestTransition()
         {
+            questdsl.State stx = questdsl.Parser.ParseNode("xxx",
+@"trans
+$assignment = uuo
+
+depend.sub == text
+----
+$localvar += 1
+depend.sub = $assignment
+");
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.Transition));
+            Assert.AreEqual((stx as questdsl.Transition).IsTrigger, false);
+
+            stx = questdsl.Parser.ParseNode("xxx",
+@"--arg4 $var0
+$assignment = uuo
+
+depend.sub == text
+----
+$localvar += 1
+depend.sub = $assignment
+");
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.Transition));
+            Assert.AreEqual((stx as questdsl.Transition).IsTrigger, false);
+            Assert.AreEqual((stx as questdsl.Transition).simlinks.Count, 1);
+            Assert.AreEqual((stx as questdsl.Transition).simlinks[4], "var0");
         }
     }
 }

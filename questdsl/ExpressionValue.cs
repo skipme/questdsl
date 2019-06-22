@@ -21,6 +21,7 @@ namespace questdsl
         public enum RefType
         {
             NotReferred,
+            Substate,
             Null,
             Arg,
             List,
@@ -84,14 +85,18 @@ namespace questdsl
 
                     break;
                 case ValueType.SubstateName:
+                    TypeOfReference = RefType.Substate;
                     break;
                 case ValueType.StateName_SubstateRef:
+                    TypeOfReference = RefType.Substate;
                     vars.Add(right);
                     break;
                 case ValueType.StateRef_SubstateName:
+                    TypeOfReference = RefType.Substate;
                     vars.Add(left);
                     break;
                 case ValueType.StateRef_SubstateRef:
+                    TypeOfReference = RefType.Substate;
                     vars.Add(left);
                     vars.Add(right);
                     break;

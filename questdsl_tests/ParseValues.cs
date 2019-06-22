@@ -81,14 +81,14 @@ namespace questdsl_tests
             Assert.AreEqual(val.vars[0], "image");
 
             val = p.ParseValue(" statename.subname ");
-            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.NotReferred);
+            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.Substate);
             Assert.AreEqual(val.TypeValue, questdsl.ExpressionValue.ValueType.SubstateName);
             Assert.AreEqual(val.Left, "statename");
             Assert.AreEqual(val.Right, "subname");
             Assert.AreEqual(val.vars.Count, 0);
 
             val = p.ParseValue(" statename.$subname ");
-            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.NotReferred);
+            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.Substate);
             Assert.AreEqual(val.TypeValue, questdsl.ExpressionValue.ValueType.StateName_SubstateRef);
             Assert.AreEqual(val.Left, "statename");
             Assert.AreEqual(val.Right, "subname");
@@ -96,7 +96,7 @@ namespace questdsl_tests
             Assert.AreEqual(val.vars[0], "subname");
 
             val = p.ParseValue(" $statename.subname ");
-            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.NotReferred);
+            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.Substate);
             Assert.AreEqual(val.TypeValue, questdsl.ExpressionValue.ValueType.StateRef_SubstateName);
             Assert.AreEqual(val.Left, "statename");
             Assert.AreEqual(val.Right, "subname");
@@ -104,7 +104,7 @@ namespace questdsl_tests
             Assert.AreEqual(val.vars[0], "statename");
 
             val = p.ParseValue(" $statename.$subname ");
-            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.NotReferred);
+            Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.Substate);
             Assert.AreEqual(val.TypeValue, questdsl.ExpressionValue.ValueType.StateRef_SubstateRef);
             Assert.AreEqual(val.Left, "statename");
             Assert.AreEqual(val.Right, "subname");

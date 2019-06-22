@@ -194,6 +194,7 @@ namespace questdsl
                 {
                     NodeDeclaredType = NodeType.Trigger;
                 }
+                this.SectionExecutionBody = true;
             }
 
             public void SectionSeparated()
@@ -214,11 +215,17 @@ namespace questdsl
                         this.AppendMultivar("");
                     return;
                 }
+                if (this.NodeDeclaredType == NodeType.undeclared)
+                {
+                    return;
+                }
                 if (!this.SectionExecutionBody && ProbesOr != null && ProbesOr.Count > 0)
                     throw new Exception();
                 if (this.SectionExecutionBody && (ExecBody == null || ExecBody.Count == 0))
                     throw new Exception();
 
+                if (!this.SectionExecutionBody)
+                    return;
 
                 if (ProbesOr == null || ProbesOr.Count == 0)
                 {
@@ -243,6 +250,8 @@ namespace questdsl
         {
             if (context.NodeDeclaredType == ParserContext.NodeType.undeclared)
                 throw new Exception();
+
+            this.context.EmptyLineOccured();
 
             switch (context.NodeDeclaredType)
             {
