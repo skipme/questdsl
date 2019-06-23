@@ -48,6 +48,7 @@
     <Compile Include="ExpressionSubStateDefinition.cs" />
     <Compile Include="ExpressionValue.cs" />
     <Compile Include="Parser.cs" />
+    <Compile Include="ParserContext.cs" />
     <Compile Include="ParserExceptions.cs" />
     <Compile Include="ParserSection.cs" />
     <Compile Include="Section.cs" />

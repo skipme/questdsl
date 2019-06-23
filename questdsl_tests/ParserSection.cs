@@ -41,6 +41,14 @@ namespace questdsl_tests
             p = new questdsl.Parser();
             p.AppendLine("trans");
             Assert.AreEqual(p.context.NodeDeclaredType, questdsl.Parser.ParserContext.NodeType.Transition);
+
+            p = new questdsl.Parser();
+            p.AppendLine("-->move location");
+            Assert.AreEqual(p.context.ExecBody.Count, 1);
+            Assert.AreEqual(p.context.ExecBody[0].InvokeTransition, "move");
+            Assert.AreEqual(p.context.ExecBody[0].InvokeArgs.Count, 1);
+            Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].Left, "location");
         }
 
         [Test]

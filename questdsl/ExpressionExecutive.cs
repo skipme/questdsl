@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace questdsl
 {
@@ -32,6 +33,18 @@ namespace questdsl
         public ExpressionValue ExLeftPart;
         public ExpressionValue ExRightPart;
 
+        public string InvokeTransition;
+        public List<ExpressionValue> InvokeArgs;
+
+        public ExpressionExecutive(string invokeName, List<ExpressionValue> argsList)
+        {
+            FuncType = ExecuteType.Invocation;
+            InvokeTransition = invokeName;
+            InvokeArgs = argsList;
+
+            if (argsList == null || invokeName == null)
+                throw new Exception();
+        }
         public ExpressionExecutive(ExecuteType func, ExpressionValue left, ExpressionValue right)
         {
             if (func != ExecuteType.ToList &&
@@ -59,7 +72,7 @@ namespace questdsl
                     {
                         throw new Exception("");
                     }
-                    if(left.TypeValue == ExpressionValue.ValueType.number
+                    if (left.TypeValue == ExpressionValue.ValueType.number
                         || left.TypeValue == ExpressionValue.ValueType.string_text)
                     {
                         throw new Exception("");
@@ -75,6 +88,7 @@ namespace questdsl
                     }
                     break;
                 case ExecuteType.Invocation:
+                    throw new Exception();
                     break;
                 case ExecuteType.ToList:
                     break;
