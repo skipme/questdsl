@@ -16,8 +16,11 @@ namespace questdsl
         public enum ExecuteType
         {
             Assign,           // a=b
-            //AssignAdd,        // a=b+c
-            //AssignMinus,      // a=b-c
+            AssignAdd,        // a=b+c
+            AssignSub,        // a=b-c
+            AssignMul,        // a=b*c
+            AssignDiv,        // a=b/c
+            AssignModulo,     // a=b%c
 
             Increment,        // ++
             Decrement,        // --
@@ -29,6 +32,7 @@ namespace questdsl
 
             ToList,           // -->toList stateName (then substate values accessed by $list1, $list2...)
         }
+        public ExpressionValue AssignVar;
         public ExecuteType FuncType;
         public ExpressionValue ExLeftPart;
         public ExpressionValue ExRightPart;
@@ -44,6 +48,28 @@ namespace questdsl
 
             if (argsList == null || invokeName == null)
                 throw new Exception();
+        }
+        public ExpressionExecutive(ExpressionValue assignVar, ExecuteType func, ExpressionValue left, ExpressionValue right)
+        {
+            if (assignVar == null || left == null || right == null)
+                throw new Exception();
+
+            if (assignVar.TypeOfReference == ExpressionValue.RefType.NotReferred || assignVar.TypeOfReference == ExpressionValue.RefType.Null)
+                throw new Exception();
+            this.AssignVar = assignVar;
+
+            List<ExecuteType> etchck = new List<ExecuteType>() {
+                ExecuteType.AssignAdd,
+                ExecuteType.AssignDiv,
+                ExecuteType.AssignModulo,
+                ExecuteType.AssignMul,
+                ExecuteType.AssignSub};
+            FuncType = func;
+            if (!etchck.Contains(func))
+                throw new Exception();
+
+            ExLeftPart = left;
+            ExRightPart = right;
         }
         public ExpressionExecutive(ExecuteType func, ExpressionValue left, ExpressionValue right)
         {
@@ -93,6 +119,7 @@ namespace questdsl
                 case ExecuteType.ToList:
                     break;
                 default:
+                    throw new Exception();
                     break;
             }
 

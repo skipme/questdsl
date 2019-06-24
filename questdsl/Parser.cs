@@ -57,7 +57,8 @@ namespace questdsl
             substate_declaration,
             condition,
             executive,
-            executive_invocation
+            executive_invocation,
+            executive_assign_op
         }
 
         public LineType EvaluateLineType(string line)
@@ -77,7 +78,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
             if (string.IsNullOrWhiteSpace(line))
                 return LineType.empty;
 
-            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^=>!<\+-]+)\s*$|^\s*([^=>!<\+-]+)\s*(=|\+=|-=)\s*([^=>!<\+-]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)\s*(.+)*$");
+            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^=>!<\+-]+)\s*$|^\s*([^=>!<\+\-\*/%]+)\s*(=|\+=|-=)\s*([^=>!<\+\-\*/%]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)\s*(.+)*$|^\s*([^=>!<\+\-\*/%]+)\s*=\s*([^=>!<\+\-\*/%]+)\s*(\+|-|\*|/|%)\s*([^=>!<\+\-\*/%]+)\s*$");
             if (m.Success)
             {
                 if (m.Groups[1].Success)
@@ -147,6 +148,17 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                     }
                     return LineType.executive_invocation;
                 }
+                if (m.Groups[20].Success)
+                {
+                    if (parserGroups != null)
+                    {
+                        parserGroups.Add("var", m.Groups[17].Value.Trim());
+                        parserGroups.Add("left", m.Groups[18].Value);
+                        parserGroups.Add("op", m.Groups[19].Value);
+                        parserGroups.Add("right", m.Groups[20].Value);
+                    }
+                    return LineType.executive_assign_op;
+                }
             }
             return LineType.undetermined;
         }
@@ -170,7 +182,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
         }
         public PartType EvaluatePartType(string line, Dictionary<string, string> parserGroups)
         {
-            Match m = Regex.Match(line, @"^\s*(\w+)\.(\w+)\s*$|^\s*(\w+)\.\$(\w+)\s*$|^\s*\$(\w+)\.(\w+)\s*$|^\s*\$(\w+)\.\$(\w+)\s*$|^\s*(\d+)\s*$|^\s*""(.*)""\s*$|^""(.*[^""])$|^([^""].*)""$|^\s*\$(\w+)$");
+            Match m = Regex.Match(line, @"^\s*(\w+)\.(\w+)\s*$|^\s*(\w+)\.\$(\w+)\s*$|^\s*\$(\w+)\.(\w+)\s*$|^\s*\$(\w+)\.\$(\w+)\s*$|^\s*(\d+)\s*$|^\s*""(.*)""\s*$|^""(.*[^""])$|^([^""].*)""$|^\s*\$(\w+)\s*$");
             if (m.Success)
             {
                 if (m.Groups[2].Success)

@@ -46,9 +46,20 @@ namespace questdsl_tests
             p.AppendLine("-->move location");
             Assert.AreEqual(p.context.ExecBody.Count, 1);
             Assert.AreEqual(p.context.ExecBody[0].InvokeTransition, "move");
+            Assert.AreEqual(p.context.ExecBody[0].FuncType, questdsl.ExpressionExecutive.ExecuteType.Invocation);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs.Count, 1);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].TypeValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].Left, "location");
+
+            p = new questdsl.Parser();
+            p.AppendLine("$var = $k + 1");
+            Assert.AreEqual(p.context.ExecBody.Count, 1);
+            Assert.AreEqual(p.context.ExecBody[0].AssignVar.Left, "var");
+            Assert.AreEqual(p.context.ExecBody[0].AssignVar.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+            Assert.AreEqual(p.context.ExecBody[0].FuncType, questdsl.ExpressionExecutive.ExecuteType.AssignAdd);
+            Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.Left, "k");
+            Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.Num, 1);
         }
 
         [Test]

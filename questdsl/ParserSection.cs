@@ -179,6 +179,38 @@ namespace questdsl
                         context.PushExec(cond);
                     }
                     break;
+                case LineType.executive_assign_op:
+                    {
+                        ExpressionExecutive.ExecuteType op;
+                        switch (parsedParts["op"])
+                        {
+                            case "+":
+                                op = ExpressionExecutive.ExecuteType.AssignAdd;
+                                break;
+                            case "-":
+                                op = ExpressionExecutive.ExecuteType.AssignSub;
+                                break;
+                            case "*":
+                                op = ExpressionExecutive.ExecuteType.AssignMul;
+                                break;
+                            case "/":
+                                op = ExpressionExecutive.ExecuteType.AssignDiv;
+                                break;
+                            case "%":
+                                op = ExpressionExecutive.ExecuteType.AssignModulo;
+                                break;
+                            default:
+                                throw new Exception();
+                                break;
+                        }
+                        ExpressionValue assignVar = ParseValue(parsedParts["var"]);
+                        
+                        ExpressionValue leftVal = ParseValue(parsedParts["left"]);
+                        ExpressionValue rightVal = ParseValue(parsedParts["right"]);
+                        ExpressionExecutive cond = new ExpressionExecutive(assignVar, op, leftVal, rightVal);
+                        context.PushExec(cond);
+                    }
+                    break;
                 case LineType.comment:
                     break;
                 case LineType.empty:
