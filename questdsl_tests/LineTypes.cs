@@ -47,7 +47,7 @@ namespace questdsl_tests
             Assert.AreEqual(parser.EvaluateLineType("substate: $val"), questdsl.Parser.LineType.substate_declaration);
             Assert.AreEqual(parser.EvaluateLineType("substate.$: val"), questdsl.Parser.LineType.substate_declaration);
 
-            Assert.AreEqual(parser.EvaluateLineType("--arg9 mnemo"), questdsl.Parser.LineType.simlink);
+            Assert.AreEqual(parser.EvaluateLineType("--arg9 mnemo"), questdsl.Parser.LineType.symlink);
             Assert.AreEqual(parser.EvaluateLineType(" "), questdsl.Parser.LineType.empty);
 
 

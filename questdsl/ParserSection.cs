@@ -19,7 +19,7 @@ namespace questdsl
             {
                 //try
                 //{
-                p.AppendLine(lines[i]);
+                p.AppendLine(lines[i], i);
                 //}
                 //catch (Exception e)
                 //{
@@ -49,14 +49,18 @@ namespace questdsl
                 case ParserContext.NodeType.Trigger:
                     return new Transition(context.NodeName, true, context.Sections);
                 case ParserContext.NodeType.Transition:
-                    return new Transition(context.NodeName, false, context.Sections, context.simlinks);
+                    return new Transition(context.NodeName, false, context.Sections, context.symlinks);
                 default:
                     throw new Exception();
                     break;
             }
 
         }
-
+        public void AppendLine(string line, int lineNumber)
+        {
+            context.CurrentLineNumber = lineNumber;
+            AppendLine(line);
+        }
         public void AppendLine(string line)
         {
             Dictionary<string, string> parsedParts = new Dictionary<string, string>();
@@ -64,8 +68,8 @@ namespace questdsl
 
             switch (lineType)
             {
-                case LineType.simlink: // only for transitions
-                    context.AddSimlink(int.Parse(parsedParts["arg"]), parsedParts["sim"]);
+                case LineType.symlink: // only for transitions
+                    context.AddSymlink(int.Parse(parsedParts["arg"]), parsedParts["sym"]);
                     break;
                 case LineType.section_separator:
                     context.SectionSeparated();

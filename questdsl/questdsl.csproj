@@ -42,11 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompilationContext.cs" />
+    <Compile Include="ExpressionSymlink.cs" />
     <Compile Include="Expression.cs" />
     <Compile Include="ExpressionBool.cs" />
     <Compile Include="ExpressionExecutive.cs" />
     <Compile Include="ExpressionSubStateDefinition.cs" />
     <Compile Include="ExpressionValue.cs" />
+    <Compile Include="Hinge.cs" />
+    <Compile Include="Linter.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="ParserContext.cs" />
     <Compile Include="ParserExceptions.cs" />

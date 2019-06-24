@@ -51,15 +51,23 @@ namespace questdsl_tests
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].TypeValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].Left, "location");
 
-            p = new questdsl.Parser();
-            p.AppendLine("$var = $k + 1");
-            Assert.AreEqual(p.context.ExecBody.Count, 1);
-            Assert.AreEqual(p.context.ExecBody[0].AssignVar.Left, "var");
-            Assert.AreEqual(p.context.ExecBody[0].AssignVar.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ExecBody[0].FuncType, questdsl.ExpressionExecutive.ExecuteType.AssignAdd);
-            Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.Left, "k");
-            Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.Num, 1);
+            Action<string, questdsl.ExpressionExecutive.ExecuteType> checkAssignOp = (op, optype) =>
+             {
+                 p = new questdsl.Parser();
+                 p.AppendLine("$var = $k " + op + " 1");
+                 Assert.AreEqual(p.context.ExecBody.Count, 1);
+                 Assert.AreEqual(p.context.ExecBody[0].AssignVar.Left, "var");
+                 Assert.AreEqual(p.context.ExecBody[0].AssignVar.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+                 Assert.AreEqual(p.context.ExecBody[0].FuncType, optype);
+                 Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.Left, "k");
+                 Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+                 Assert.AreEqual(p.context.ExecBody[0].ExRightPart.Num, 1);
+             };
+            checkAssignOp("+", questdsl.ExpressionExecutive.ExecuteType.AssignAdd);
+            checkAssignOp("/", questdsl.ExpressionExecutive.ExecuteType.AssignDiv);
+            checkAssignOp("%", questdsl.ExpressionExecutive.ExecuteType.AssignModulo);
+            checkAssignOp("*", questdsl.ExpressionExecutive.ExecuteType.AssignMul);
+            checkAssignOp("-", questdsl.ExpressionExecutive.ExecuteType.AssignSub);
         }
 
         [Test]

@@ -13,19 +13,19 @@ namespace questdsl
 
         public Transition(string name, bool IsItTrigger
             , List<Section> sections = null
-            , Dictionary<int, string> simlinks = null)
+            , Dictionary<int, ExpressionSymlink> symlinks = null)
             : base(name)
         {
             this.sections = sections ?? new List<Section>();
             IsTrigger = IsItTrigger;
-            this.simlinks = simlinks ?? new Dictionary<int, string>();
+            this.simlinks = symlinks ?? new Dictionary<int, ExpressionSymlink>();
 
-            if (simlinks == null && !IsTrigger ||
-                simlinks != null && IsTrigger)
+            if (symlinks == null && !IsTrigger ||
+                symlinks != null && IsTrigger)
                 throw new Exception();
 
         }
-        public Dictionary<int, string> simlinks;
+        public Dictionary<int, ExpressionSymlink> simlinks;
         public List<Section> sections;
         public override bool SubStateModifies => IsChangedStates;
 

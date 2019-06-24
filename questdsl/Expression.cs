@@ -8,6 +8,7 @@ namespace questdsl
 {
     public abstract class Expression
     {
+        public int LineNumber;
         // this is for decision making
         public abstract bool SubStateModifies { get; }
         public abstract string Compile();

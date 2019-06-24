@@ -50,7 +50,7 @@ namespace questdsl
         public enum LineType
         {
             comment,
-            simlink,
+            symlink,
             empty,
             undetermined,
             section_separator,
@@ -93,9 +93,9 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                     if (parserGroups != null)
                     {
                         parserGroups.Add("arg", m.Groups[2].Value);
-                        parserGroups.Add("sim", m.Groups[3].Value);
+                        parserGroups.Add("sym", m.Groups[3].Value);
                     }
-                    return LineType.simlink;
+                    return LineType.symlink;
                 }
                 if (m.Groups[4].Success)
                 {

@@ -21,6 +21,7 @@ namespace questdsl
                 Trigger,
                 Transition
             }
+            public int CurrentLineNumber = -1;
             public NodeType NodeDeclaredType = NodeType.undeclared;
             public readonly string NodeName;
             public State StateNodeInstance;
@@ -37,11 +38,11 @@ namespace questdsl
 
             public StringBuilder AccumulatedMultivar;
 
-            public Dictionary<int, string> simlinks = new Dictionary<int, string>();
+            public Dictionary<int, ExpressionSymlink> symlinks = new Dictionary<int, ExpressionSymlink>();
             public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
             public List<Section> Sections;
 
-            public void AddSimlink(int argnum, string name)
+            public void AddSymlink(int argnum, string name)
             {
                 if (NodeDeclaredType != NodeType.Transition
                     && NodeDeclaredType != NodeType.undeclared)
@@ -51,10 +52,11 @@ namespace questdsl
                     throw new Exception();
                 if (this.simlinkReservedVars.Contains(name))
                     throw new Exception();
-                if (this.simlinks.ContainsKey(argnum))
+                if (this.symlinks.ContainsKey(argnum))
                     throw new Exception();
-
-                this.simlinks.Add(argnum, name);
+                ExpressionSymlink expr = new ExpressionSymlink(argnum, name);
+                expr.LineNumber = CurrentLineNumber;
+                this.symlinks.Add(argnum, expr);
                 this.simlinkReservedVars.Add(name);
 
                 NodeDeclaredType = NodeType.Transition;
@@ -83,6 +85,7 @@ namespace questdsl
                     }
                     else
                     {
+                        Value.LineNumber = CurrentLineNumber;
                         StateNodeInstance.AddSubstate(keyName, Value);
                     }
                 }
@@ -103,8 +106,10 @@ namespace questdsl
                     SubStateMultiline = "$$$$$";
                 }
                 else
+                {
+                    Value.LineNumber = CurrentLineNumber;
                     StateNodeInstance.AddSubstate(null, Value);
-
+                }
                 this.DeclaredSubstatesByList = true;
                 NodeDeclaredType = NodeType.State;
             }
@@ -140,6 +145,7 @@ namespace questdsl
                 if (ProbesOr == null)
                     ProbesOr = new List<ExpressionBool>();
 
+                expression.LineNumber = CurrentLineNumber;
                 ProbesOr.Add(expression);
 
                 if (NodeDeclaredType == NodeType.undeclared)
@@ -166,6 +172,7 @@ namespace questdsl
                 if (ExecBody == null)
                     ExecBody = new List<ExpressionExecutive>();
 
+                expression.LineNumber = CurrentLineNumber;
                 ExecBody.Add(expression);
 
                 if (NodeDeclaredType != NodeType.Transition)
