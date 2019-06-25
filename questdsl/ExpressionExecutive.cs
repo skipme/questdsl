@@ -40,6 +40,41 @@ namespace questdsl
         public string InvokeTransition;
         public List<ExpressionValue> InvokeArgs;
 
+        public IEnumerable<string> GetVarsUsed()
+        {
+            if (AssignVar != null)
+            {
+                foreach (var v in AssignVar.vars)
+                {
+                    yield return v;
+                }
+            }
+            if (ExLeftPart != null)
+            {
+                foreach (var v in ExLeftPart.vars)
+                {
+                    yield return v;
+                }
+            }
+            if (ExRightPart != null)
+            {
+                foreach (var v in ExRightPart.vars)
+                {
+                    yield return v;
+                }
+            }
+        }
+        public IEnumerable<string> GetVarsAssigned()
+        {
+            if (AssignVar != null && AssignVar.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            {
+                yield return AssignVar.Left;
+            }
+            if (ExLeftPart != null && this.FuncType == ExecuteType.Assign && ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            {
+                yield return ExLeftPart.Left;
+            }
+        }
         public ExpressionExecutive(string invokeName, List<ExpressionValue> argsList)
         {
             FuncType = ExecuteType.Invocation;
@@ -87,6 +122,9 @@ namespace questdsl
             switch (func)
             {
                 case ExecuteType.Assign:
+                    if (left.TypeOfReference == ExpressionValue.RefType.Null)
+                        throw new Exception();
+                    break;
                 case ExecuteType.Increment:
                 case ExecuteType.Decrement:
                 case ExecuteType.Add:

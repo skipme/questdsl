@@ -18,14 +18,14 @@ namespace questdsl
         {
             this.sections = sections ?? new List<Section>();
             IsTrigger = IsItTrigger;
-            this.simlinks = symlinks ?? new Dictionary<int, ExpressionSymlink>();
+            this.symlinks = symlinks ?? new Dictionary<int, ExpressionSymlink>();
 
             if (symlinks == null && !IsTrigger ||
                 symlinks != null && IsTrigger)
                 throw new Exception();
 
         }
-        public Dictionary<int, ExpressionSymlink> simlinks;
+        public Dictionary<int, ExpressionSymlink> symlinks;
         public List<Section> sections;
         public override bool SubStateModifies => IsChangedStates;
 

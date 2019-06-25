@@ -90,8 +90,8 @@ depend.sub = $assignment
 ");
             Assert.AreEqual(stx.GetType(), typeof(questdsl.Transition));
             Assert.AreEqual((stx as questdsl.Transition).IsTrigger, false);
-            Assert.AreEqual((stx as questdsl.Transition).simlinks.Count, 1);
-            Assert.AreEqual((stx as questdsl.Transition).simlinks[4], "var0");
+            Assert.AreEqual((stx as questdsl.Transition).symlinks.Count, 1);
+            Assert.AreEqual((stx as questdsl.Transition).symlinks[4], "var0");
         }
     }
 }
