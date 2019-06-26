@@ -35,20 +35,85 @@ namespace questdsl
             CheckNullOps(h, issues);
             CheckSymlinks(h, issues);
             CheckImagesOps(h, issues);
+            CheckVars(h, issues);
+            CheckStates(h, issues);
 
             return issues;
+        }
+        private static void CheckVars(Hinge h, List<LintIssue> issues)
+        {
+            foreach (var t in h.Transitions.Concat(h.Triggers))
+            {
+                Dictionary<string, bool> usings = new Dictionary<string, bool>();
+                if (!t.Value.IsTrigger)
+                {
+                    foreach (var s in t.Value.symlinks)
+                    {
+                        usings.Add(s.Value.VarName, false);
+                    }
+                }
+                SortedSet<string> assignedVars = new SortedSet<string>();
+                foreach (var sect in t.Value.sections)
+                {
+                    foreach (var ex in sect.Body)
+                    {
+                        foreach (var varname in ex.GetVarsUsed())
+                        {
+                            if (!assignedVars.Contains(varname) && usings.ContainsKey(varname))
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "variable " + varname + " used before assignment" });
+                            }
+                        }
+                        foreach (var varname in ex.GetVarsAssigned())
+                        {
+                            assignedVars.Add(varname);
+                        }
+                    }
+                }
+            }
+        }
+        private static void CheckStates(Hinge h, List<LintIssue> issues)
+        {
+            foreach (var t in h.Transitions.Concat(h.Triggers))
+            {
+                SortedSet<string> assignedVars = new SortedSet<string>();
+                foreach (var sect in t.Value.sections)
+                {
+                    foreach (var ex in sect.Body)
+                    {
+                        Action<ExpressionValue> checkVal = (ExpressionValue ev) =>
+                        {
+                            if (ev != null
+                                && ev.TypeOfReference == ExpressionValue.RefType.Substate
+                                && ev.TypeValue == ExpressionValue.ValueType.SubstateName)
+                            {
+                                if (!h.States.ContainsKey(ev.Left))
+                                {
+                                    issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "substate " + ev.Left + " not found" });
+                                }
+                            }
+                        };
+                        checkVal(ex.AssignVar);
+                        checkVal(ex.ExLeftPart);
+                        checkVal(ex.ExRightPart);
+                    }
+                }
+            }
         }
         private static void CheckNullOps(Hinge h, List<LintIssue> issues)
         {
         }
         private static void CheckImagesOps(Hinge h, List<LintIssue> issues)
         {
-            foreach (var t in h.Transitions)
+            foreach (var t in h.Transitions.Concat(h.Triggers))
             {
                 Dictionary<string, bool> usings = new Dictionary<string, bool>();
-                foreach (var s in t.Value.symlinks)
+                if (!t.Value.IsTrigger)
                 {
-                    usings.Add(s.Value.VarName, false);
+                    foreach (var s in t.Value.symlinks)
+                    {
+                        usings.Add(s.Value.VarName, false);
+                    }
                 }
 
                 foreach (var sect in t.Value.sections)
@@ -73,6 +138,15 @@ namespace questdsl
                             && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Image)
                         {
                             issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "image ref not allowed in this op" });
+                        }
+
+                        if (ex.ExLeftPart != null && ex.FuncType == ExpressionExecutive.ExecuteType.Assign && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.List)
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.ExLeftPart.ArgOrListIndex + " reassigned" });
+                        }
+                        if (ex.AssignVar != null && ex.AssignVar.TypeOfReference == ExpressionValue.RefType.List)
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.AssignVar.ArgOrListIndex + " reassigned" });
                         }
                     }
                 }
@@ -110,19 +184,13 @@ namespace questdsl
                         {
                             issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "arg " + ex.AssignVar.ArgOrListIndex + " reassigned" });
                         }
-                        if (ex.AssignVar != null && ex.AssignVar.TypeOfReference == ExpressionValue.RefType.List)
-                        {
-                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.AssignVar.ArgOrListIndex + " reassigned" });
-                        }
+
 
                         if (ex.ExLeftPart != null && ex.FuncType == ExpressionExecutive.ExecuteType.Assign && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Arg)
                         {
                             issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "arg " + ex.ExLeftPart.ArgOrListIndex + " reassigned" });
                         }
-                        if (ex.ExLeftPart != null && ex.FuncType == ExpressionExecutive.ExecuteType.Assign && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.List)
-                        {
-                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.ExLeftPart.ArgOrListIndex + " reassigned" });
-                        }
+
 
                     }
                 }
