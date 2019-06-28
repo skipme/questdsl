@@ -33,27 +33,46 @@ namespace questdsl
             // err: local var used before assignment
             List<LintIssue> issues = new List<LintIssue>();
             CheckNullOps(h, issues);
-            CheckSymlinks(h, issues);
-            CheckImagesOps(h, issues);
-            CheckVars(h, issues);
-            CheckStates(h, issues);
+            CheckSymlinks(h.GetTransitions(), issues);
+            CheckImagesOps(h.GetTransitions().Concat(h.GetTriggers()), issues);
+            CheckVars(h.GetTransitions().Concat(h.GetTriggers()), issues);
+            CheckStates(h.GetStates(), h.GetTransitions().Concat(h.GetTriggers()), issues);
 
             return issues;
         }
-        private static void CheckVars(Hinge h, List<LintIssue> issues)
+        public static List<LintIssue> CheckNode(Hinge h, State node)
         {
-            foreach (var t in h.Transitions.Concat(h.Triggers))
+            List<LintIssue> issues = new List<LintIssue>();
+            CheckNullOps(h, issues);
+
+            if (node is Transition && !(node as Transition).IsTrigger)
+                CheckSymlinks(new Transition[] { node as Transition }, issues);
+
+            if (node is Transition)
+                CheckImagesOps(new Transition[] { node as Transition }, issues);
+
+            if (node is Transition)
+                CheckVars(new Transition[] { node as Transition }, issues);
+
+            if (node is Transition)
+                CheckStates(h.GetStates(), new Transition[] { node as Transition }, issues);
+
+            return issues;
+        }
+        private static void CheckVars(IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
+        {
+            foreach (var t in transitionsAndTriggers)
             {
                 Dictionary<string, bool> usings = new Dictionary<string, bool>();
-                if (!t.Value.IsTrigger)
+                if (!t.IsTrigger)
                 {
-                    foreach (var s in t.Value.symlinks)
+                    foreach (var s in t.symlinks)
                     {
                         usings.Add(s.Value.VarName, false);
                     }
                 }
                 SortedSet<string> assignedVars = new SortedSet<string>();
-                foreach (var sect in t.Value.sections)
+                foreach (var sect in t.sections)
                 {
                     foreach (var ex in sect.Body)
                     {
@@ -72,12 +91,12 @@ namespace questdsl
                 }
             }
         }
-        private static void CheckStates(Hinge h, List<LintIssue> issues)
+        private static void CheckStates(IEnumerable<State> states, IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
         {
-            foreach (var t in h.Transitions.Concat(h.Triggers))
+            foreach (var t in transitionsAndTriggers)
             {
                 SortedSet<string> assignedVars = new SortedSet<string>();
-                foreach (var sect in t.Value.sections)
+                foreach (var sect in t.sections)
                 {
                     foreach (var ex in sect.Body)
                     {
@@ -87,7 +106,7 @@ namespace questdsl
                                 && ev.TypeOfReference == ExpressionValue.RefType.Substate
                                 && ev.TypeValue == ExpressionValue.ValueType.SubstateName)
                             {
-                                if (!h.States.ContainsKey(ev.Left))
+                                if (!(from s in states where s.Name == ev.Left select s).Any())
                                 {
                                     issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "substate " + ev.Left + " not found" });
                                 }
@@ -103,20 +122,20 @@ namespace questdsl
         private static void CheckNullOps(Hinge h, List<LintIssue> issues)
         {
         }
-        private static void CheckImagesOps(Hinge h, List<LintIssue> issues)
+        private static void CheckImagesOps(IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
         {
-            foreach (var t in h.Transitions.Concat(h.Triggers))
+            foreach (var t in transitionsAndTriggers)
             {
                 Dictionary<string, bool> usings = new Dictionary<string, bool>();
-                if (!t.Value.IsTrigger)
+                if (!t.IsTrigger)
                 {
-                    foreach (var s in t.Value.symlinks)
+                    foreach (var s in t.symlinks)
                     {
                         usings.Add(s.Value.VarName, false);
                     }
                 }
 
-                foreach (var sect in t.Value.sections)
+                foreach (var sect in t.sections)
                 {
                     foreach (var ex in sect.Body)
                     {
@@ -152,19 +171,19 @@ namespace questdsl
                 }
             }
         }
-        private static void CheckSymlinks(Hinge h, List<LintIssue> issues)
+        private static void CheckSymlinks(IEnumerable<Transition> transitions, List<LintIssue> issues)
         {
-            foreach (var t in h.Transitions)
+            foreach (var t in transitions)
             {
                 Dictionary<string, ExpressionSymlink> usingss = new Dictionary<string, ExpressionSymlink>();
                 Dictionary<string, bool> usings = new Dictionary<string, bool>();
-                foreach (var s in t.Value.symlinks)
+                foreach (var s in t.symlinks)
                 {
                     usings.Add(s.Value.VarName, false);
                     usingss.Add(s.Value.VarName, s.Value);
                 }
 
-                foreach (var sect in t.Value.sections)
+                foreach (var sect in t.sections)
                 {
                     foreach (var ex in sect.Body)
                     {
