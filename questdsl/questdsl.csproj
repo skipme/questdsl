@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeCompletion.cs" />
     <Compile Include="CompilationContext.cs" />
     <Compile Include="ExpressionSymlink.cs" />
     <Compile Include="Expression.cs" />

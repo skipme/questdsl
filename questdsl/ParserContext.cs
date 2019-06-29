@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace questdsl
@@ -42,6 +43,8 @@ namespace questdsl
             public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
             public List<Section> Sections;
 
+            public List<string> DefinedVars = new List<string>();
+
             public void AddSymlink(int argnum, string name)
             {
                 if (NodeDeclaredType != NodeType.Transition
@@ -58,6 +61,8 @@ namespace questdsl
                 expr.LineNumber = CurrentLineNumber;
                 this.symlinks.Add(argnum, expr);
                 this.simlinkReservedVars.Add(name);
+
+                DefinedVars.Add("$" + name);
 
                 NodeDeclaredType = NodeType.Transition;
             }
@@ -174,6 +179,9 @@ namespace questdsl
 
                 expression.LineNumber = CurrentLineNumber;
                 ExecBody.Add(expression);
+
+                DefinedVars.AddRange(from vas in expression.GetVarsAssigned() select "$" + vas);
+
 
                 if (NodeDeclaredType != NodeType.Transition)
                 {
