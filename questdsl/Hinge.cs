@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace questdsl
 {
-    class Hinge
+    public class Hinge
     {
         public Hinge(List<State> nodes)
         {
-            this.AllNodes = nodes;
+            this.AllNodes = new List<State>();
             this.AllNodesDict = new Dictionary<string, State>();
 
             for (int i = 0; i < nodes.Count; i++)

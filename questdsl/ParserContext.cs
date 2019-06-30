@@ -40,7 +40,7 @@ namespace questdsl
             public StringBuilder AccumulatedMultivar;
 
             public Dictionary<int, ExpressionSymlink> symlinks = new Dictionary<int, ExpressionSymlink>();
-            public SortedSet<string> simlinkReservedVars = new SortedSet<string>();
+            public SortedSet<string> symlinkReservedVars = new SortedSet<string>();
             public List<Section> Sections;
 
             public List<string> DefinedVars = new List<string>();
@@ -53,14 +53,14 @@ namespace questdsl
 
                 if (argnum <= 0 || argnum > 100)
                     throw new Exception();
-                if (this.simlinkReservedVars.Contains(name))
+                if (this.symlinkReservedVars.Contains(name))
                     throw new Exception();
                 if (this.symlinks.ContainsKey(argnum))
                     throw new Exception();
                 ExpressionSymlink expr = new ExpressionSymlink(argnum, name);
                 expr.LineNumber = CurrentLineNumber;
                 this.symlinks.Add(argnum, expr);
-                this.simlinkReservedVars.Add(name);
+                this.symlinkReservedVars.Add(name);
 
                 DefinedVars.Add("$" + name);
 

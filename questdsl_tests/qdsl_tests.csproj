@@ -48,6 +48,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Completion.cs" />
     <Compile Include="UtilFuncs.cs" />
     <Compile Include="LineTypes.cs" />
     <Compile Include="ParseClock.cs" />
