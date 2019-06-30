@@ -122,7 +122,9 @@ namespace questdsl
             switch (func)
             {
                 case ExecuteType.Assign:
-                    if (left.TypeOfReference == ExpressionValue.RefType.Null)
+                    if (left.TypeOfReference == ExpressionValue.RefType.Null
+                        || left.TypeValue == ExpressionValue.ValueType.number
+                        || left.TypeValue == ExpressionValue.ValueType.string_text)
                         throw new Exception();
                     break;
                 case ExecuteType.Increment:
