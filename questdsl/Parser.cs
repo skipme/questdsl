@@ -58,7 +58,8 @@ namespace questdsl
             condition,
             executive,
             executive_invocation,
-            executive_assign_op
+            executive_assign_op,
+            dialogue_say
         }
 
         public LineType EvaluateLineType(string line)
@@ -78,7 +79,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
             if (string.IsNullOrWhiteSpace(line))
                 return LineType.empty;
 
-            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^=>!<\+-]+)\s*$|^\s*([^=>!<\+\-\*/%]+)\s*(=|\+=|-=)\s*([^=>!<\+\-\*/%]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)\s*(.+)*$|^\s*([^=>!<\+\-\*/%]+)\s*=\s*([^=>!<\+\-\*/%]+)\s*(\+|-|\*|/|%)\s*([^=>!<\+\-\*/%]+)\s*$");
+            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(.+)$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^\s=>!<\+-]+)\s*$|^\s*([^\s=>!<\+\-\*/%]+)\s*(=|\+=|-=)\s*([^=>!<\+\-\*/%]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^-->\s*([\w\.\$]*)\s*(.+)*$|^\s*([^\s=>!<\+\-\*/%]+)\s*=\s*([^=>!<\+\-\*/%]+)\s*(\+|-|\*|/|%)\s*([^=>!<\+\-\*/%]+)\s*$|^\s*>\s*(\w+)\s*(.+)\s*$");
             if (m.Success)
             {
                 if (m.Groups[1].Success)
@@ -158,6 +159,15 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                         parserGroups.Add("right", m.Groups[20].Value);
                     }
                     return LineType.executive_assign_op;
+                }
+                if (m.Groups[22].Success)
+                {
+                    if (parserGroups != null)
+                    {
+                        parserGroups.Add("characterName", m.Groups[21].Value);
+                        parserGroups.Add("text", m.Groups[22].Value);
+                    }
+                    return LineType.dialogue_say;
                 }
             }
             return LineType.undetermined;

@@ -50,6 +50,8 @@ namespace questdsl
                     return new Transition(context.NodeName, true, context.Sections);
                 case ParserContext.NodeType.Transition:
                     return new Transition(context.NodeName, false, context.Sections, context.symlinks);
+                case ParserContext.NodeType.Dialogue:
+                    return new Dialogue(context.NodeName, context.Sections, context.symlinks);
                 default:
                     throw new Exception();
                     break;
@@ -68,11 +70,27 @@ namespace questdsl
 
             switch (lineType)
             {
-                case LineType.symlink: // only for transitions
+                case LineType.symlink: // only for transitions and dialogs
                     context.AddSymlink(int.Parse(parsedParts["arg"]), parsedParts["sym"]);
                     break;
                 case LineType.section_separator:
                     context.SectionSeparated();
+                    break;
+                case LineType.dialogue_say:
+                    if (context.NodeDeclaredType != ParserContext.NodeType.State)
+                    {
+                        context.NodeDeclaredType = ParserContext.NodeType.Dialogue;
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                    ExpressionExecutive exec = new ExpressionExecutive("say", new List<ExpressionValue>()
+                    {
+                        ParseValue(parsedParts["characterName"]),
+                        ParseValue(parsedParts["text"]),
+                    });
+                    context.PushExec(exec);
                     break;
                 case LineType.substate_declaration: // only for states
                     {
@@ -208,7 +226,7 @@ namespace questdsl
                                 break;
                         }
                         ExpressionValue assignVar = ParseValue(parsedParts["var"]);
-                        
+
                         ExpressionValue leftVal = ParseValue(parsedParts["left"]);
                         ExpressionValue rightVal = ParseValue(parsedParts["right"]);
                         ExpressionExecutive cond = new ExpressionExecutive(assignVar, op, leftVal, rightVal);
@@ -221,6 +239,7 @@ namespace questdsl
                     context.EmptyLineOccured();
                     break;
                 case LineType.undetermined:
+                    // TODO: replace multiline logic - line can detected as any linetype not only undetermined
                     if (context.IsInMultivar)
                     {
                         Dictionary<string, string> groups = new Dictionary<string, string>();

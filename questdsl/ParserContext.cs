@@ -20,7 +20,8 @@ namespace questdsl
                 undeclared,
                 State,
                 Trigger,
-                Transition
+                Transition,
+                Dialogue
             }
             public int CurrentLineNumber = -1;
             public NodeType NodeDeclaredType = NodeType.undeclared;
@@ -169,9 +170,9 @@ namespace questdsl
                 {
                     throw new Exception();
                 }
-                if (HasSections && (ProbesOr == null || ProbesOr.Count == 0))
+                if (NodeDeclaredType != NodeType.Dialogue && HasSections && (ProbesOr == null || ProbesOr.Count == 0))
                     throw new Exception();
-                if (!this.SectionExecutionBody && (HasSections || (ProbesOr != null && ProbesOr.Count > 0)))
+                if (NodeDeclaredType != NodeType.Dialogue && !this.SectionExecutionBody && (HasSections || (ProbesOr != null && ProbesOr.Count > 0)))
                     throw new Exception();
 
                 if (ExecBody == null)
@@ -183,7 +184,7 @@ namespace questdsl
                 DefinedVars.AddRange(from vas in expression.GetVarsAssigned() select "$" + vas);
 
 
-                if (NodeDeclaredType != NodeType.Transition)
+                if (NodeDeclaredType != NodeType.Transition && NodeDeclaredType != NodeType.Dialogue)
                 {
                     NodeDeclaredType = NodeType.Trigger;
                 }
@@ -222,7 +223,8 @@ namespace questdsl
 
                 if (ProbesOr == null || ProbesOr.Count == 0)
                 {
-                    if (this.HasSections)
+                    if (this.NodeDeclaredType != NodeType.Dialogue
+                        && this.HasSections)
                         throw new Exception();
                 }
                 this.Sections.Add(new Section(ProbesOr, ExecBody));

@@ -9,8 +9,8 @@ namespace questdsl_tests
         [Test]
         public void TestState()
         {
-            questdsl.State stx = questdsl.Parser.ParseNode("xxx", 
-                @"lidsted substates
+            questdsl.State stx = questdsl.Parser.ParseNode("xxx",
+                @"listed substates
 12223
 ""multiline text
 ends here""
@@ -25,7 +25,7 @@ ends here""
             stx = null;
 
             stx = questdsl.Parser.ParseNode("xxx",
-                @"a: lidsted substates
+                @"a: listed substates
 b: 12223
 c: ""multiline text
 ends here""
@@ -92,6 +92,58 @@ depend.sub = $assignment
             Assert.AreEqual((stx as questdsl.Transition).IsTrigger, false);
             Assert.AreEqual((stx as questdsl.Transition).symlinks.Count, 1);
             Assert.AreEqual((stx as questdsl.Transition).symlinks[4].VarName, "var0");
+        }
+        [Test]
+        public void TestDialog()
+        {
+            questdsl.State stx = questdsl.Parser.ParseNode("xxx",
+                @"
+>name text
+
+>name2 text
+>name2 text
+
+>name text
+");
+            stx = questdsl.Parser.ParseNode("xxx",
+                @"
+x.y > 5
+----
+>name text
+
+x.y < 5
+----
+>name2 text
+>name2 text
+
+>name text
+state.val = 11
+");
+
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.Dialogue));
+
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections.Count, 3);
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[1].ExRightPart.Num, 11);
+            stx = null;
+
+            stx = questdsl.Parser.ParseNode("xxx",
+                @">a listed substates
+>b 12223
+>c ""multiline text
+ends here""
+
+>d 5512
+
+>x ""other
+
+multiline""
+
+>e 11");
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.State));
+
+            Assert.AreEqual(stx.Substates.Count, 6);
+            Assert.AreEqual(stx.Substates[5].initialValue.Num, 11);
+            Assert.AreEqual(stx.Substates[5].SubStateName, "e");
         }
     }
 }
