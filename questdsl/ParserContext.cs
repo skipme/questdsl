@@ -37,6 +37,7 @@ namespace questdsl
             public bool DeclaredSubstatesByList;
 
             public string SubStateMultiline;
+            public string SayMultiline;
 
             public StringBuilder AccumulatedMultivar;
 

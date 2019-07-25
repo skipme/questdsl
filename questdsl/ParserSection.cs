@@ -85,10 +85,48 @@ namespace questdsl
                     {
                         throw new Exception();
                     }
+
+                    if ("$$$$$" == parsedParts["characterName"])
+                        throw new Exception();
+
+                    Dictionary<string, string> textgroups = new Dictionary<string, string>();
+                    PartType ptext = this.EvaluatePartType(parsedParts["text"], textgroups);
+                    ExpressionValue textvalue = null;
+                    switch (ptext)
+                    {
+                        case PartType.text_string:
+                        case PartType.substate:
+                        case PartType.substate_subVar:
+                        case PartType.substate_stateVar:
+                        case PartType.substate_allVar:
+                            textvalue = new ExpressionValue(ExpressionValue.ValueType.string_text, parsedParts["text"]);
+                            break;
+                        case PartType.digit:
+                            textvalue = new ExpressionValue(ExpressionValue.ValueType.number, null, null, int.Parse(textgroups["number"]));
+                            break;
+                        case PartType.text_multiline:
+                            textvalue = new ExpressionValue(ExpressionValue.ValueType.string_text, textgroups["string"]);
+                            break;
+                        case PartType.text_multiline_start:
+                            if (context.IsInMultivar)
+                                throw new Exception();
+                            context.AppendMultivar(textgroups["string"]);
+                            break;
+                        case PartType.text_multiline_end:
+                            throw new Exception();
+                            break;
+                        default:
+                            break;
+                    }
+                    if(ptext == PartType.text_multiline_start)
+                    {
+                        context.SayMultiline = parsedParts["characterName"];
+                        break;
+                    }
                     ExpressionExecutive exec = new ExpressionExecutive("say", new List<ExpressionValue>()
                     {
                         ParseValue(parsedParts["characterName"]),
-                        ParseValue(parsedParts["text"]),
+                        textvalue,
                     });
                     context.PushExec(exec);
                     break;
@@ -249,11 +287,30 @@ namespace questdsl
                         else
                         {
                             string lines = context.EndMultivar(groups["string"]);
-                            if (context.SubStateMultiline != null)
+                            if (context.SubStateMultiline == null && context.NodeDeclaredType == ParserContext.NodeType.State)
                             {
-                                context.DeclareSubstate(null, new ExpressionValue(ExpressionValue.ValueType.string_text, lines));
+                                throw new Exception();
                             }
-                            else throw new Exception();
+                            if (context.SayMultiline == null && context.NodeDeclaredType == ParserContext.NodeType.Dialogue)
+                            {
+                                throw new Exception();
+                            }
+                            if (context.NodeDeclaredType == ParserContext.NodeType.State)
+                            {
+                                context.DeclareSubstate(null, new ExpressionValue(ExpressionValue.ValueType.string_text,
+                                    lines));
+                            }
+                            else if (context.NodeDeclaredType == ParserContext.NodeType.Dialogue)
+                            {
+
+                                ExpressionExecutive execsay = new ExpressionExecutive("say", new List<ExpressionValue>()
+                                {
+                                    ParseValue(context.SayMultiline), new ExpressionValue(ExpressionValue.ValueType.string_text,
+                                    lines)
+                                });
+                                context.SayMultiline = null;
+                                context.PushExec(execsay);
+                            }
                         }
                     }
                     else

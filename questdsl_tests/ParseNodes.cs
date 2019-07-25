@@ -123,6 +123,10 @@ state.val = 11
             Assert.AreEqual(stx.GetType(), typeof(questdsl.Dialogue));
 
             Assert.AreEqual(((questdsl.Dialogue)stx).sections.Count, 3);
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[0].ProbesOr.Count, 1);
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[0].ProbesOr[0].ExLeftPart.SubstatePath, "x.y");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[0].ProbesOr[0].ExRightPart.Num, 5);
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[0].ProbesOr[0].ExOperation, questdsl.ExpressionBool.Operation.bt);
             Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[1].ExRightPart.Num, 11);
             stx = null;
 
@@ -139,11 +143,13 @@ ends here""
 multiline""
 
 >e 11");
-            Assert.AreEqual(stx.GetType(), typeof(questdsl.State));
+            Assert.AreEqual(stx.GetType(), typeof(questdsl.Dialogue));
 
-            Assert.AreEqual(stx.Substates.Count, 6);
-            Assert.AreEqual(stx.Substates[5].initialValue.Num, 11);
-            Assert.AreEqual(stx.Substates[5].SubStateName, "e");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections.Count, 4);
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[0].InvokeTransition, "say");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[0].InvokeArgs[0].Left, "x");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[3].Body[0].InvokeArgs[0].Left, "e");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[3].Body[0].InvokeArgs[1].Num, 11);
         }
     }
 }
