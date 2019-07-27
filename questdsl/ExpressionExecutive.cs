@@ -32,24 +32,32 @@ namespace questdsl
 
             ToList,           // -->toList stateName (then substate values accessed by $list1, $list2...)
         }
-        public ExpressionValue AssignVar;
+        public ExpressionValue AssignResultVar;
         public ExecuteType FuncType;
         public ExpressionValue ExLeftPart;
         public ExpressionValue ExRightPart;
 
-        public string InvokeTransition;
+        public string InvokeTransitionName;
         public List<ExpressionValue> InvokeArgs;
 
         public IEnumerable<string> GetVarsUsed()
         {
-            if (AssignVar != null)
+            if (AssignResultVar != null)
             {
-                foreach (var v in AssignVar.vars)
+                foreach (var v in AssignResultVar.vars)
                 {
                     yield return v;
                 }
             }
-            if (ExLeftPart != null)
+            foreach (var v in GetVarsReaded())
+            {
+                yield return v;
+            }
+        }
+        public IEnumerable<string> GetVarsReaded()
+        {
+            if (this.FuncType != ExecuteType.Assign
+                && ExLeftPart != null)
             {
                 foreach (var v in ExLeftPart.vars)
                 {
@@ -64,13 +72,33 @@ namespace questdsl
                 }
             }
         }
+        public string GetVarDefined()
+        {
+            if (this.FuncType >= ExecuteType.AssignAdd
+                && this.FuncType <= ExecuteType.AssignModulo
+                && AssignResultVar != null
+                && AssignResultVar.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            {
+                return AssignResultVar.Left;
+            }
+            if (ExLeftPart != null
+                && this.FuncType == ExecuteType.Assign
+                && ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            {
+                return ExLeftPart.Left;
+            }
+            return null;
+        }
         public IEnumerable<string> GetVarsAssigned()
         {
-            if (AssignVar != null && AssignVar.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            if (AssignResultVar != null
+                && AssignResultVar.TypeOfReference == ExpressionValue.RefType.LocalVar)
             {
-                yield return AssignVar.Left;
+                yield return AssignResultVar.Left;
             }
-            if (ExLeftPart != null && this.FuncType == ExecuteType.Assign && ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
+            if (ExLeftPart != null
+                && this.FuncType == ExecuteType.Assign
+                && ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
             {
                 yield return ExLeftPart.Left;
             }
@@ -78,7 +106,7 @@ namespace questdsl
         public ExpressionExecutive(string invokeName, List<ExpressionValue> argsList)
         {
             FuncType = ExecuteType.Invocation;
-            InvokeTransition = invokeName;
+            InvokeTransitionName = invokeName;
             InvokeArgs = argsList;
 
             if (argsList == null || invokeName == null)
@@ -91,7 +119,7 @@ namespace questdsl
 
             if (assignVar.TypeOfReference == ExpressionValue.RefType.NotReferred || assignVar.TypeOfReference == ExpressionValue.RefType.Null)
                 throw new Exception();
-            this.AssignVar = assignVar;
+            this.AssignResultVar = assignVar;
 
             List<ExecuteType> etchck = new List<ExecuteType>() {
                 ExecuteType.AssignAdd,
@@ -123,8 +151,8 @@ namespace questdsl
             {
                 case ExecuteType.Assign:
                     if (left.TypeOfReference == ExpressionValue.RefType.Null
-                        || left.TypeValue == ExpressionValue.ValueType.number
-                        || left.TypeValue == ExpressionValue.ValueType.string_text)
+                        || left.TypeOfValue == ExpressionValue.ValueType.number
+                        || left.TypeOfValue == ExpressionValue.ValueType.string_text)
                         throw new Exception();
                     break;
                 case ExecuteType.Increment:
@@ -138,8 +166,8 @@ namespace questdsl
                     {
                         throw new Exception("");
                     }
-                    if (left.TypeValue == ExpressionValue.ValueType.number
-                        || left.TypeValue == ExpressionValue.ValueType.string_text)
+                    if (left.TypeOfValue == ExpressionValue.ValueType.number
+                        || left.TypeOfValue == ExpressionValue.ValueType.string_text)
                     {
                         throw new Exception("");
                     }

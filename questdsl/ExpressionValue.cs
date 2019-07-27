@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace questdsl
 {
-    public class ExpressionValue : Expression
+    public class ExpressionValue : Expression, ICloneable
     {
         public override bool SubStateModifies => false;
 
@@ -38,7 +38,7 @@ namespace questdsl
             }
         }
         public int Num;
-        public ValueType TypeValue;
+        public ValueType TypeOfValue;
 
         public RefType TypeOfReference = RefType.NotReferred;
 
@@ -46,7 +46,7 @@ namespace questdsl
 
         public ExpressionValue(ValueType valType, string left, string right = null, int number = -1)
         {
-            TypeValue = valType;
+            TypeOfValue = valType;
             if (!Enum.IsDefined(typeof(ValueType), valType))
                 throw new Exception();
 
@@ -116,6 +116,12 @@ namespace questdsl
         public override string Compile()
         {
             throw new System.NotImplementedException();
+        }
+
+        public object Clone()
+        {
+            return new ExpressionValue(this.TypeOfValue,
+                Left, Right, Num);
         }
     }
 }

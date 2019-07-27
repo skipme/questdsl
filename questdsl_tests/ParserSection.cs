@@ -20,7 +20,7 @@ namespace questdsl_tests
             p.AppendLine("$a= that is it ");
             Assert.AreEqual(p.context.ExecBody.Count, 1);
             Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ExecBody[0].ExRightPart.TypeOfValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ExecBody[0].ExRightPart.Left, "that is it");
 
             Assert.Throws<Exception>(() => p.AppendLine("$a==$x"));
@@ -45,10 +45,10 @@ namespace questdsl_tests
             p = new questdsl.Parser();
             p.AppendLine("-->move location");
             Assert.AreEqual(p.context.ExecBody.Count, 1);
-            Assert.AreEqual(p.context.ExecBody[0].InvokeTransition, "move");
+            Assert.AreEqual(p.context.ExecBody[0].InvokeTransitionName, "move");
             Assert.AreEqual(p.context.ExecBody[0].FuncType, questdsl.ExpressionExecutive.ExecuteType.Invocation);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs.Count, 1);
-            Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].TypeOfValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ExecBody[0].InvokeArgs[0].Left, "location");
 
             Action<string, questdsl.ExpressionExecutive.ExecuteType> checkAssignOp = (op, optype) =>
@@ -56,8 +56,8 @@ namespace questdsl_tests
                  p = new questdsl.Parser();
                  p.AppendLine("$var = $k " + op + " 1");
                  Assert.AreEqual(p.context.ExecBody.Count, 1);
-                 Assert.AreEqual(p.context.ExecBody[0].AssignVar.Left, "var");
-                 Assert.AreEqual(p.context.ExecBody[0].AssignVar.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
+                 Assert.AreEqual(p.context.ExecBody[0].AssignResultVar.Left, "var");
+                 Assert.AreEqual(p.context.ExecBody[0].AssignResultVar.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
                  Assert.AreEqual(p.context.ExecBody[0].FuncType, optype);
                  Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.Left, "k");
                  Assert.AreEqual(p.context.ExecBody[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
@@ -77,20 +77,20 @@ namespace questdsl_tests
             p.AppendLine("a!=$c");
             Assert.AreEqual(p.context.ProbesOr.Count, 1);
             Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeOfValue, questdsl.ExpressionValue.ValueType.string_text);
 
             p = new questdsl.Parser();
             p.AppendLine("a string on left side !=$c");
             Assert.AreEqual(p.context.ProbesOr.Count, 1);
             Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeOfValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.Left, "a string on left side");
 
             p = new questdsl.Parser();
             p.AppendLine("\"a string on left side\" !=$c");
             Assert.AreEqual(p.context.ProbesOr.Count, 1);
             Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeValue, questdsl.ExpressionValue.ValueType.string_text);
+            Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeOfValue, questdsl.ExpressionValue.ValueType.string_text);
             Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.Left, "a string on left side");
 
             Assert.Throws<Exception>(() => p.AppendLine("a!=c"));
@@ -100,7 +100,7 @@ namespace questdsl_tests
             Assert.AreEqual(p.context.ProbesOr.Count, 1);
             Assert.AreEqual(p.context.ProbesOr[0].ExOperation, questdsl.ExpressionBool.Operation.eq);
             Assert.AreEqual(p.context.ProbesOr[0].ExLeftPart.TypeOfReference, questdsl.ExpressionValue.RefType.LocalVar);
-            Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.TypeValue, questdsl.ExpressionValue.ValueType.number);
+            Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.TypeOfValue, questdsl.ExpressionValue.ValueType.number);
             Assert.AreEqual(p.context.ProbesOr[0].ExRightPart.Num, 41);
 
             p = new questdsl.Parser();

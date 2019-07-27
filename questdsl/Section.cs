@@ -29,14 +29,14 @@ namespace questdsl
 
             foreach (var item in ProbesOr)
             {
-                if (item.ExLeftPart.TypeValue == ExpressionValue.ValueType.SubstateName)
+                if (item.ExLeftPart.TypeOfValue == ExpressionValue.ValueType.SubstateName)
                     yield return item.ExLeftPart.SubstatePath;
-                else if (item.ExLeftPart.TypeValue == ExpressionValue.ValueType.StateRef_SubstateRef)
+                else if (item.ExLeftPart.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateRef)
                     yield return $"{item.ExLeftPart.Left}.*";
 
-                if (item.ExRightPart.TypeValue == ExpressionValue.ValueType.SubstateName)
+                if (item.ExRightPart.TypeOfValue == ExpressionValue.ValueType.SubstateName)
                     yield return item.ExRightPart.SubstatePath;
-                else if (item.ExRightPart.TypeValue == ExpressionValue.ValueType.StateRef_SubstateRef)
+                else if (item.ExRightPart.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateRef)
                     yield return $"{item.ExRightPart.Left}.*";
             }
 

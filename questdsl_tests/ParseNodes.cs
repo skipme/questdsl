@@ -146,7 +146,7 @@ multiline""
             Assert.AreEqual(stx.GetType(), typeof(questdsl.Dialogue));
 
             Assert.AreEqual(((questdsl.Dialogue)stx).sections.Count, 4);
-            Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[0].InvokeTransition, "say");
+            Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[0].InvokeTransitionName, "say");
             Assert.AreEqual(((questdsl.Dialogue)stx).sections[2].Body[0].InvokeArgs[0].Left, "x");
             Assert.AreEqual(((questdsl.Dialogue)stx).sections[3].Body[0].InvokeArgs[0].Left, "e");
             Assert.AreEqual(((questdsl.Dialogue)stx).sections[3].Body[0].InvokeArgs[1].Num, 11);

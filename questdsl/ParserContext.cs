@@ -182,7 +182,7 @@ namespace questdsl
                 expression.LineNumber = CurrentLineNumber;
                 ExecBody.Add(expression);
 
-                DefinedVars.AddRange(from vas in expression.GetVarsAssigned() select "$" + vas);
+                DefinedVars.Add("$" + expression.GetVarDefined());
 
 
                 if (NodeDeclaredType != NodeType.Transition && NodeDeclaredType != NodeType.Dialogue)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace questdsl
 {
-    class Linter
+    public class Linter
     {
         public enum LintIssueType
         {
@@ -76,16 +76,16 @@ namespace questdsl
                 {
                     foreach (var ex in sect.Body)
                     {
-                        foreach (var varname in ex.GetVarsUsed())
+                        foreach (var varname in ex.GetVarsReaded())
                         {
-                            if (!assignedVars.Contains(varname) && usings.ContainsKey(varname))
+                            if (!assignedVars.Contains(varname) && !usings.ContainsKey(varname))
                             {
                                 issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "variable " + varname + " used before assignment" });
                             }
                         }
-                        foreach (var varname in ex.GetVarsAssigned())
+                        foreach (var varas in ex.GetVarsAssigned())
                         {
-                            assignedVars.Add(varname);
+                            assignedVars.Add(varas);
                         }
                     }
                 }
@@ -104,7 +104,7 @@ namespace questdsl
                         {
                             if (ev != null
                                 && ev.TypeOfReference == ExpressionValue.RefType.Substate
-                                && ev.TypeValue == ExpressionValue.ValueType.SubstateName)
+                                && ev.TypeOfValue == ExpressionValue.ValueType.SubstateName)
                             {
                                 if (!(from s in states where s.Name == ev.Left select s).Any())
                                 {
@@ -112,7 +112,7 @@ namespace questdsl
                                 }
                             }
                         };
-                        checkVal(ex.AssignVar);
+                        checkVal(ex.AssignResultVar);
                         checkVal(ex.ExLeftPart);
                         checkVal(ex.ExRightPart);
                     }
@@ -139,7 +139,7 @@ namespace questdsl
                 {
                     foreach (var ex in sect.Body)
                     {
-                        if (ex.AssignVar != null && (ex.AssignVar.TypeOfReference == ExpressionValue.RefType.Image
+                        if (ex.AssignResultVar != null && (ex.AssignResultVar.TypeOfReference == ExpressionValue.RefType.Image
                             || ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Image
                             || ex.ExRightPart.TypeOfReference == ExpressionValue.RefType.Image))
                         {
@@ -163,9 +163,9 @@ namespace questdsl
                         {
                             issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.ExLeftPart.ArgOrListIndex + " reassigned" });
                         }
-                        if (ex.AssignVar != null && ex.AssignVar.TypeOfReference == ExpressionValue.RefType.List)
+                        if (ex.AssignResultVar != null && ex.AssignResultVar.TypeOfReference == ExpressionValue.RefType.List)
                         {
-                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.AssignVar.ArgOrListIndex + " reassigned" });
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "list " + ex.AssignResultVar.ArgOrListIndex + " reassigned" });
                         }
                     }
                 }
@@ -199,18 +199,14 @@ namespace questdsl
                                 issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "symlink arg " + vara + " reassigned" });
                             }
                         }
-                        if (ex.AssignVar != null && ex.AssignVar.TypeOfReference == ExpressionValue.RefType.Arg)
+                        if (ex.AssignResultVar != null && ex.AssignResultVar.TypeOfReference == ExpressionValue.RefType.Arg)
                         {
-                            issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "arg " + ex.AssignVar.ArgOrListIndex + " reassigned" });
+                            issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "arg " + ex.AssignResultVar.ArgOrListIndex + " reassigned" });
                         }
-
-
                         if (ex.ExLeftPart != null && ex.FuncType == ExpressionExecutive.ExecuteType.Assign && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Arg)
                         {
                             issues.Add(new LintIssue { IssueType = LintIssueType.warning, LineNumber = ex.LineNumber, Message = "arg " + ex.ExLeftPart.ArgOrListIndex + " reassigned" });
                         }
-
-
                     }
                 }
                 foreach (var s in usings)

@@ -13,14 +13,15 @@ namespace questdsl
         public string StateName;
         public string SubStateName;
         public ExpressionValue initialValue;
+        public ExpressionValue runtimeValue;
         public ExpressionSubStateDefinition(string StateName, string left, ExpressionValue right)
         {
             this.StateName = StateName;
             SubStateName = left;
             initialValue = right;
-            if (initialValue.TypeValue == ExpressionValue.ValueType.StateName_SubstateRef ||
-               initialValue.TypeValue == ExpressionValue.ValueType.StateRef_SubstateRef ||
-               initialValue.TypeValue == ExpressionValue.ValueType.StateRef_SubstateName
+            if (initialValue.TypeOfValue == ExpressionValue.ValueType.StateName_SubstateRef ||
+               initialValue.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateRef ||
+               initialValue.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateName
                  )
             {
                 throw new Exception("");
@@ -32,7 +33,7 @@ namespace questdsl
         {
             get
             {
-                return initialValue.TypeValue == ExpressionValue.ValueType.SubstateName;
+                return initialValue.TypeOfValue == ExpressionValue.ValueType.SubstateName;
             }
         }
         public override string Compile()

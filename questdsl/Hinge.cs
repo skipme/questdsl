@@ -78,6 +78,11 @@ namespace questdsl
                    where s is Transition && (s as Transition).IsTrigger
                    select s as Transition;
         }
-
+        public IEnumerable<Dialogue> GetDialogues()
+        {
+            return from s in AllNodes
+                   where s is Dialogue
+                   select s as Dialogue;
+        }
     }
 }
