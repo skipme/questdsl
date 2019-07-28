@@ -118,7 +118,7 @@ namespace questdsl
                         default:
                             break;
                     }
-                    if(ptext == PartType.text_multiline_start)
+                    if (ptext == PartType.text_multiline_start)
                     {
                         context.SayMultiline = parsedParts["characterName"];
                         break;
@@ -225,7 +225,7 @@ namespace questdsl
                                 break;
                         }
                         ExpressionValue leftVal = ParseValue(parsedParts["left"]);
-                        ExpressionValue rightVal = ParseValue(parsedParts["right"]);
+                        ExpressionValue rightVal = parsedParts.ContainsKey("right") ? ParseValue(parsedParts["right"]) : null;
                         ExpressionExecutive cond = new ExpressionExecutive(op, leftVal, rightVal);
                         context.PushExec(cond);
                     }

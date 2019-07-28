@@ -59,16 +59,22 @@ namespace questdsl
             if (this.FuncType != ExecuteType.Assign
                 && ExLeftPart != null)
             {
-                foreach (var v in ExLeftPart.vars)
+                if (ExLeftPart.TypeOfValue != ExpressionValue.ValueType.Reference)
                 {
-                    yield return v;
+                    foreach (var v in ExLeftPart.vars)
+                    {
+                        yield return v;
+                    }
                 }
             }
             if (ExRightPart != null)
             {
-                foreach (var v in ExRightPart.vars)
+                if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference)
                 {
-                    yield return v;
+                    foreach (var v in ExRightPart.vars)
+                    {
+                        yield return v;
+                    }
                 }
             }
         }
@@ -111,6 +117,14 @@ namespace questdsl
 
             if (argsList == null || invokeName == null)
                 throw new Exception();
+
+            if (string.Compare(invokeName, "toList", true) == 0)
+            {
+                if (argsList.Count != 1)
+                    throw new Exception();
+
+                FuncType = ExecuteType.ToList;
+            }
         }
         public ExpressionExecutive(ExpressionValue assignVar, ExecuteType func, ExpressionValue left, ExpressionValue right)
         {

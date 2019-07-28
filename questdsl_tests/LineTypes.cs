@@ -96,6 +96,7 @@ namespace questdsl_tests
             Assert.AreEqual(parser.EvaluateLineType("a=b%c"), questdsl.Parser.LineType.executive_assign_op);
 
             Assert.AreEqual(parser.EvaluateLineType("-->a"), questdsl.Parser.LineType.executive_invocation);
+            Assert.AreEqual(parser.EvaluateLineType(" -->ToList somestate "), questdsl.Parser.LineType.executive_invocation);
             Assert.AreEqual(parser.EvaluateLineType("-->a c d e"), questdsl.Parser.LineType.executive_invocation);
             Assert.AreEqual(parser.EvaluateLineType("-->a c d $e"), questdsl.Parser.LineType.executive_invocation);
             Assert.AreEqual(parser.EvaluateLineType("-->a c d $e.e"), questdsl.Parser.LineType.executive_invocation);

@@ -68,7 +68,7 @@ namespace questdsl_tests
             val = p.ParseValue("$list14");
             Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.List);
             Assert.AreEqual(val.TypeOfValue, questdsl.ExpressionValue.ValueType.Reference);
-            Assert.AreEqual(val.ArgOrListIndex, 14);
+            Assert.AreEqual(val.ArgOrListIndex, 13);
             Assert.AreEqual(val.Left, "list14");
             Assert.AreEqual(val.vars.Count, 1);
             Assert.AreEqual(val.vars[0], "list14");

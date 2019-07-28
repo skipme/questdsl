@@ -71,7 +71,7 @@ namespace questdsl
                         m = Regex.Match(left, @"^list(\d+)$");
                         if (m.Success && m.Groups[1].Success)
                         {
-                            ArgOrListIndex = Int32.Parse(m.Groups[1].Value);
+                            ArgOrListIndex = Int32.Parse(m.Groups[1].Value) - 1;
                             TypeOfReference = RefType.List;
                         }
                         else if (left == "null")

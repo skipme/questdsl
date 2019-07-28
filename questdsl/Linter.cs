@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace questdsl
@@ -35,7 +36,7 @@ namespace questdsl
             CheckNullOps(h, issues);
             CheckSymlinks(h.GetTransitions(), issues);
             CheckImagesOps(h.GetTransitions().Concat(h.GetTriggers()), issues);
-            CheckVars(h.GetTransitions().Concat(h.GetTriggers()), issues);
+            CheckVars(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
             CheckStates(h.GetStates(), h.GetTransitions().Concat(h.GetTriggers()), issues);
 
             return issues;
@@ -52,14 +53,14 @@ namespace questdsl
                 CheckImagesOps(new Transition[] { node as Transition }, issues);
 
             if (node is Transition)
-                CheckVars(new Transition[] { node as Transition }, issues);
+                CheckVars(h, new Transition[] { node as Transition }, issues);
 
             if (node is Transition)
                 CheckStates(h.GetStates(), new Transition[] { node as Transition }, issues);
 
             return issues;
         }
-        private static void CheckVars(IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
+        private static void CheckVars(Hinge h, IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
         {
             foreach (var t in transitionsAndTriggers)
             {
@@ -74,8 +75,44 @@ namespace questdsl
                 SortedSet<string> assignedVars = new SortedSet<string>();
                 foreach (var sect in t.sections)
                 {
+                    bool listDefined = false;
+                    State toListNode = null;
                     foreach (var ex in sect.Body)
                     {
+                        if (ex.FuncType == ExpressionExecutive.ExecuteType.ToList)
+                        {
+                            if (!h.AllNodesDict.ContainsKey(ex.InvokeArgs[0].Left))
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"State node \"{ex.InvokeArgs[0].Left}\" not found, toList op " });
+                            }
+                            else
+                            {
+                                toListNode = h.AllNodesDict[ex.InvokeArgs[0].Left];
+                                listDefined = true;
+                            }
+                        }
+                        if ((ex.ExLeftPart != null && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.List)
+                            || (ex.ExRightPart != null && ex.ExRightPart.TypeOfReference == ExpressionValue.RefType.List))
+                        {
+                            if (!listDefined)
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"list reference used before assignment" });
+                            }
+                            else
+                            {
+                                if (ex.ExLeftPart != null && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.List
+                                    && (toListNode.Substates.Count <= ex.ExLeftPart.ArgOrListIndex || ex.ExLeftPart.ArgOrListIndex < 0))
+                                {
+                                    issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"list reference {ex.ExLeftPart.ArgOrListIndex} out of substate list bounds" });
+                                }
+                                if (ex.ExRightPart != null && ex.ExRightPart.TypeOfReference == ExpressionValue.RefType.List
+                                    && (toListNode.Substates.Count <= ex.ExRightPart.ArgOrListIndex || ex.ExRightPart.ArgOrListIndex < 0))
+                                {
+                                    issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"list reference {ex.ExRightPart.ArgOrListIndex} out of substate list bounds" });
+                                }
+                            }
+                        }
+
                         foreach (var varname in ex.GetVarsReaded())
                         {
                             if (!assignedVars.Contains(varname) && !usings.ContainsKey(varname))
