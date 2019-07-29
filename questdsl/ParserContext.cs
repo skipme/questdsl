@@ -47,21 +47,21 @@ namespace questdsl
 
             public List<string> DefinedVars = new List<string>();
 
-            public void AddSymlink(int argnum, string name)
+            public void AddSymlink(int arg_index, string name)
             {
                 if (NodeDeclaredType != NodeType.Transition
                     && NodeDeclaredType != NodeType.undeclared)
                     throw new Exception();
 
-                if (argnum <= 0 || argnum > 100)
+                if (arg_index < 0 || arg_index > 100)
                     throw new Exception();
                 if (this.symlinkReservedVars.Contains(name))
                     throw new Exception();
-                if (this.symlinks.ContainsKey(argnum))
+                if (this.symlinks.ContainsKey(arg_index))
                     throw new Exception();
-                ExpressionSymlink expr = new ExpressionSymlink(argnum, name);
+                ExpressionSymlink expr = new ExpressionSymlink(arg_index, name);
                 expr.LineNumber = CurrentLineNumber;
-                this.symlinks.Add(argnum, expr);
+                this.symlinks.Add(arg_index, expr);
                 this.symlinkReservedVars.Add(name);
 
                 DefinedVars.Add("$" + name);

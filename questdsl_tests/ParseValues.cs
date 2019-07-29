@@ -169,11 +169,11 @@ namespace questdsl_tests
             questdsl.Parser p = new questdsl.Parser();
             p.AppendLine("--arg1 parameter");
             Assert.AreEqual(p.context.symlinks.Count, 1);
-            Assert.AreEqual(p.context.symlinks[1].VarName, "parameter");
+            Assert.AreEqual(p.context.symlinks[0].VarName, "parameter");
 
             p.AppendLine("--arg2 $parameternew");
             Assert.AreEqual(p.context.symlinks.Count, 2);
-            Assert.AreEqual(p.context.symlinks[2].VarName, "parameternew");
+            Assert.AreEqual(p.context.symlinks[1].VarName, "parameternew");
 
             Assert.Throws<Exception>(() => p.AppendLine("--arg1 parameterb"));
             Assert.Throws<Exception>(() => p.AppendLine("--arg0 parameterb"));

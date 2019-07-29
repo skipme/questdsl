@@ -71,7 +71,7 @@ namespace questdsl
             switch (lineType)
             {
                 case LineType.symlink: // only for transitions and dialogs
-                    context.AddSymlink(int.Parse(parsedParts["arg"]), parsedParts["sym"]);
+                    context.AddSymlink(int.Parse(parsedParts["arg"]) - 1, parsedParts["sym"]);
                     break;
                 case LineType.section_separator:
                     context.SectionSeparated();
