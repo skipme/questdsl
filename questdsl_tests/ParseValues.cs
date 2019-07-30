@@ -60,7 +60,7 @@ namespace questdsl_tests
             val = p.ParseValue("$arg4");
             Assert.AreEqual(val.TypeOfReference, questdsl.ExpressionValue.RefType.Arg);
             Assert.AreEqual(val.TypeOfValue, questdsl.ExpressionValue.ValueType.Reference);
-            Assert.AreEqual(val.ArgOrListIndex, 4);
+            Assert.AreEqual(val.ArgOrListIndex, 3);
             Assert.AreEqual(val.Left, "arg4");
             Assert.AreEqual(val.vars.Count, 1);
             Assert.AreEqual(val.vars[0], "arg4");

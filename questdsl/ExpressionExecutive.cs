@@ -40,6 +40,19 @@ namespace questdsl
         public string InvokeTransitionName;
         public List<ExpressionValue> InvokeArgs;
 
+        public bool IsArgsUsed
+        {
+            get
+            {
+                if (ExLeftPart?.TypeOfReference == ExpressionValue.RefType.Arg
+                    || ExRightPart?.TypeOfReference == ExpressionValue.RefType.Arg
+                    || AssignResultVar?.TypeOfReference == ExpressionValue.RefType.Arg)
+                    return true;
+
+                return false;
+            }
+        }
+
         public IEnumerable<string> GetVarsUsed()
         {
             if (AssignResultVar != null)

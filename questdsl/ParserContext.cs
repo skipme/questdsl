@@ -183,7 +183,13 @@ namespace questdsl
                 ExecBody.Add(expression);
 
                 DefinedVars.Add("$" + expression.GetVarDefined());
+                if (expression.IsArgsUsed)
+                {
+                    if (NodeDeclaredType == NodeType.State)
+                        throw new Exception();
 
+                    NodeDeclaredType = NodeType.Transition;
+                }
 
                 if (NodeDeclaredType != NodeType.Transition && NodeDeclaredType != NodeType.Dialogue)
                 {

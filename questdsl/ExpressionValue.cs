@@ -63,7 +63,7 @@ namespace questdsl
                     Match m = Regex.Match(left, @"^arg(\d+)$");
                     if (m.Success && m.Groups[1].Success)
                     {
-                        ArgOrListIndex = Int32.Parse(m.Groups[1].Value);
+                        ArgOrListIndex = Int32.Parse(m.Groups[1].Value) - 1;
                         TypeOfReference = RefType.Arg;
                     }
                     else
