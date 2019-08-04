@@ -8,6 +8,7 @@ namespace questdsl
     {
         public override bool SubStateModifies => false;
 
+        public static readonly ExpressionValue NullValue = new ExpressionValue(ValueType.Reference, "null");
         public enum ValueType
         {
             Reference, // scope var

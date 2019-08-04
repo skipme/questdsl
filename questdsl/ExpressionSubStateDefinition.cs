@@ -13,6 +13,7 @@ namespace questdsl
         public string StateName;
         public string SubStateName;
         public ExpressionValue initialValue;
+        public ExpressionValue stepValue;
         public ExpressionValue runtimeValue;
         public ExpressionSubStateDefinition(string StateName, string left, ExpressionValue right)
         {
