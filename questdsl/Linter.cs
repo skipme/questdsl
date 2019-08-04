@@ -79,6 +79,12 @@ namespace questdsl
                     State toListNode = null;
                     foreach (var ex in sect.Body)
                     {
+
+                        if (ex.FuncType == ExpressionExecutive.ExecuteType.Invocation && ((!h.AllNodesDict.ContainsKey(ex.InvokeTransitionName)) || (!(h.AllNodesDict[ex.InvokeTransitionName] is Transition))
+                            || (h.AllNodesDict[ex.InvokeTransitionName] is Transition) && (h.AllNodesDict[ex.InvokeTransitionName] as Transition).IsTrigger))
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"Invokation \"{ex.InvokeTransitionName}\" not found, or not trigger " });
+                        }
                         if (ex.FuncType == ExpressionExecutive.ExecuteType.ToList)
                         {
                             if (!h.AllNodesDict.ContainsKey(ex.InvokeArgs[0].Left))
@@ -224,7 +230,7 @@ namespace questdsl
                 {
                     foreach (var ex in sect.Body)
                     {
-                        foreach (var varu in ex.GetVarsUsed())
+                        foreach (var varu in ex.GetVarsInScope())
                         {
                             if (usings.ContainsKey(varu))
                                 usings[varu] = true;

@@ -53,7 +53,7 @@ namespace questdsl
             }
         }
 
-        public IEnumerable<string> GetVarsUsed()
+        public IEnumerable<string> GetVarsInScope()
         {
             if (AssignResultVar != null)
             {
@@ -72,7 +72,7 @@ namespace questdsl
             if (this.FuncType != ExecuteType.Assign
                 && ExLeftPart != null)
             {
-                if (ExLeftPart.TypeOfValue != ExpressionValue.ValueType.Reference)
+                if (ExLeftPart.TypeOfValue != ExpressionValue.ValueType.Reference || ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
                 {
                     foreach (var v in ExLeftPart.vars)
                     {
@@ -82,7 +82,7 @@ namespace questdsl
             }
             if (ExRightPart != null)
             {
-                if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference)
+                if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference || ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
                 {
                     foreach (var v in ExRightPart.vars)
                     {
