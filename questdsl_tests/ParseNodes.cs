@@ -17,11 +17,19 @@ ends here""
 
 5512
 
-11");
+11
+
+hellloy    
+
+""  5454  ""
+");
             Assert.AreEqual(stx.GetType(), typeof(questdsl.State));
 
-            Assert.AreEqual(stx.Substates.Count, 5);
+            Assert.AreEqual(stx.Substates.Count, 7);
             Assert.AreEqual(stx.Substates[4].initialValue.Num, 11);
+            Assert.AreEqual(stx.Substates[5].initialValue.Left, "hellloy");
+            Assert.AreEqual(stx.Substates[6].initialValue.Left, "  5454  ");
+
             stx = null;
 
             stx = questdsl.Parser.ParseNode("xxx",
@@ -36,12 +44,16 @@ x: ""other
 
 multiline""
 
-e: 11");
+e: 11
+meh: value 
+");
             Assert.AreEqual(stx.GetType(), typeof(questdsl.State));
 
-            Assert.AreEqual(stx.Substates.Count, 6);
+            Assert.AreEqual(stx.Substates.Count, 7);
             Assert.AreEqual(stx.Substates[5].initialValue.Num, 11);
             Assert.AreEqual(stx.Substates[5].SubStateName, "e");
+            Assert.AreEqual(stx.Substates[6].SubStateName, "meh");
+            Assert.AreEqual(stx.Substates[6].initialValue.Left, "value");
         }
         [Test]
         public void TestTrigger()

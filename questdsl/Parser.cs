@@ -107,7 +107,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
                     if (parserGroups != null)
                     {
                         parserGroups.Add("substate", m.Groups[5].Value);
-                        parserGroups.Add("value", m.Groups[6].Value);
+                        parserGroups.Add("value", m.Groups[6].Value.TrimEnd());
                     }
                     return LineType.substate_declaration;
                 }

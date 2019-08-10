@@ -171,7 +171,7 @@ namespace questdsl_tests
             Assert.AreEqual(p.context.symlinks.Count, 1);
             Assert.AreEqual(p.context.symlinks[0].VarName, "parameter");
 
-            p.AppendLine("--arg2 $parameternew");
+            p.AppendLine("--arg2 $parameternew ");
             Assert.AreEqual(p.context.symlinks.Count, 2);
             Assert.AreEqual(p.context.symlinks[1].VarName, "parameternew");
 

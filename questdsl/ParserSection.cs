@@ -341,8 +341,10 @@ namespace questdsl
                             throw new Exception();
                         if (pt == PartType.digit)
                             context.DeclareListedSubstate(new ExpressionValue(ExpressionValue.ValueType.number, null, null, int.Parse(line)));
+                        else if (pt == PartType.text_multiline)
+                            context.DeclareListedSubstate(new ExpressionValue(ExpressionValue.ValueType.string_text, groups["string"]));
                         else
-                            context.DeclareListedSubstate(new ExpressionValue(ExpressionValue.ValueType.string_text, line));
+                            context.DeclareListedSubstate(new ExpressionValue(ExpressionValue.ValueType.string_text, line.Trim()));
 
                     }
                     break;
