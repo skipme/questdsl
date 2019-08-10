@@ -82,7 +82,7 @@ namespace questdsl
             }
             if (ExRightPart != null)
             {
-                if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference || ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
+                if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference || ExRightPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
                 {
                     foreach (var v in ExRightPart.vars)
                     {

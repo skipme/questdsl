@@ -127,6 +127,14 @@ namespace questdsl_tests
 
             Assert.Throws<Exception>(() => p.AppendLine("sometext"));
 
+            p.AppendLine("namenull: $null");
+            Assert.IsTrue(p.context.DeclaredSubstatesByName);
+            Assert.IsFalse(p.context.DeclaredSubstatesByList);
+            Assert.AreEqual(p.context.IsInMultivar, false);
+            Assert.AreEqual(p.context.NodeDeclaredType, questdsl.Parser.ParserContext.NodeType.State);
+            Assert.AreEqual(p.context.StateNodeInstance.Substates.Count, 2);
+            Assert.AreEqual(p.context.StateNodeInstance.SubstatesBook["namenull"].initialValue.TypeOfReference, questdsl.ExpressionValue.RefType.Null);
+
             p = new questdsl.Parser();
             p.AppendLine("someLine");
             Assert.IsFalse(p.context.DeclaredSubstatesByName);

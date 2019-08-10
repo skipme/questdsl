@@ -161,6 +161,12 @@ namespace questdsl
                             case PartType.text_multiline_end:
                                 throw new Exception();
                                 break;
+                            case PartType.variable:
+                                if (groups["var"] == "null")
+                                {
+                                    value = ExpressionValue.NullValue.Clone() as ExpressionValue;
+                                }
+                                break;
                             default:
                                 break;
                         }

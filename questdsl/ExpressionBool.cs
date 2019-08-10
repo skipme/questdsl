@@ -31,15 +31,24 @@ namespace questdsl
                 throw new System.Exception();
             }
         }
-        public IEnumerable<string> GetVars()
+        public IEnumerable<string> GetVarsInScope()
         {
-            foreach (var item in ExLeftPart.vars)
+            if (ExLeftPart.TypeOfValue != ExpressionValue.ValueType.Reference 
+                || ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
             {
-                yield return item;
+                foreach (var v in ExLeftPart.vars)
+                {
+                    yield return v;
+                }
             }
-            foreach (var item in ExRightPart.vars)
+
+            if (ExRightPart.TypeOfValue != ExpressionValue.ValueType.Reference 
+                || ExLeftPart.TypeOfReference == ExpressionValue.RefType.LocalVar)
             {
-                yield return item;
+                foreach (var v in ExRightPart.vars)
+                {
+                    yield return v;
+                }
             }
         }
         public override string Compile()

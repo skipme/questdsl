@@ -33,7 +33,7 @@ namespace questdsl
             // err: state not found
             // err: local var used before assignment
             List<LintIssue> issues = new List<LintIssue>();
-            CheckNullOps(h, issues);
+            CheckNullOps(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
             CheckSymlinks(h.GetTransitions(), issues);
             CheckImagesOps(h.GetTransitions().Concat(h.GetTriggers()), issues);
             CheckVars(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
@@ -44,7 +44,7 @@ namespace questdsl
         public static List<LintIssue> CheckNode(Hinge h, State node)
         {
             List<LintIssue> issues = new List<LintIssue>();
-            CheckNullOps(h, issues);
+            CheckNullOps(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
 
             if (node is Transition && !(node as Transition).IsTrigger)
                 CheckSymlinks(new Transition[] { node as Transition }, issues);
@@ -141,43 +141,81 @@ namespace questdsl
                 SortedSet<string> assignedVars = new SortedSet<string>();
                 foreach (var sect in t.sections)
                 {
+                    Action<ExpressionValue, int> checkVal = (ExpressionValue ev, int linen) =>
+                    {
+                        if (ev != null
+                            && ev.TypeOfReference == ExpressionValue.RefType.Substate
+                            && (ev.TypeOfValue == ExpressionValue.ValueType.SubstateName || ev.TypeOfValue == ExpressionValue.ValueType.StateName_SubstateRef))
+                        {
+                            if (!(from s in states where s.Name == ev.Left select s).Any())
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = linen, Message = "state " + ev.Left + " not found" });
+                            }
+                            else if (ev.TypeOfValue == ExpressionValue.ValueType.SubstateName
+                            && !((from s in states where s.Name == ev.Left select s).First().SubstatesBook.ContainsKey(ev.Right)))
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = linen, Message = $"substate `{ev.Right}` in `{ev.Left}` not found" });
+                            }
+                        }
+                    };
+                    if (sect.ProbesOr != null)
+                    {
+                        foreach (var p in sect.ProbesOr)
+                        {
+                            checkVal(p.ExLeftPart, p.LineNumber);
+                            checkVal(p.ExRightPart, p.LineNumber);
+                        }
+                    }
                     foreach (var ex in sect.Body)
                     {
-                        Action<ExpressionValue> checkVal = (ExpressionValue ev) =>
-                        {
-                            if (ev != null
-                                && ev.TypeOfReference == ExpressionValue.RefType.Substate
-                                && ev.TypeOfValue == ExpressionValue.ValueType.SubstateName)
+                        checkVal(ex.AssignResultVar, ex.LineNumber);
+                        checkVal(ex.ExLeftPart, ex.LineNumber);
+                        checkVal(ex.ExRightPart, ex.LineNumber);
+
+                        if (ex.InvokeArgs != null)
+                            foreach (var item in ex.InvokeArgs)
                             {
-                                if (!(from s in states where s.Name == ev.Left select s).Any())
-                                {
-                                    issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "substate " + ev.Left + " not found" });
-                                }
+                                checkVal(item, ex.LineNumber);
                             }
-                        };
-                        checkVal(ex.AssignResultVar);
-                        checkVal(ex.ExLeftPart);
-                        checkVal(ex.ExRightPart);
                     }
                 }
             }
         }
-        private static void CheckNullOps(Hinge h, List<LintIssue> issues)
+        private static void CheckNullOps(Hinge h, IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
         {
+            foreach (var t in transitionsAndTriggers)
+            {
+                foreach (var sect in t.sections)
+                {
+                    foreach (var ex in sect.Body)
+                    {
+                        if (ex.AssignResultVar != null && (ex.AssignResultVar.TypeOfReference == ExpressionValue.RefType.Null
+                            || ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Null
+                            || ex.ExRightPart.TypeOfReference == ExpressionValue.RefType.Null))
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "null ref not allowed in this assign operation" });
+                        }
+                        else
+                        if (ex.ExLeftPart != null && ex.FuncType == ExpressionExecutive.ExecuteType.Assign
+                            && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Null &&
+                            ex.ExRightPart != null && ex.ExRightPart.TypeOfReference != ExpressionValue.RefType.Null)
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "null ref not allowed for non image assign" });
+                        }
+                        else
+                        if (ex.ExLeftPart != null && ex.FuncType != ExpressionExecutive.ExecuteType.Assign
+                            && ex.ExLeftPart.TypeOfReference == ExpressionValue.RefType.Null)
+                        {
+                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "null ref not allowed in this op" });
+                        }
+                    }
+                }
+            }
         }
         private static void CheckImagesOps(IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
         {
             foreach (var t in transitionsAndTriggers)
             {
-                Dictionary<string, bool> usings = new Dictionary<string, bool>();
-                if (!t.IsTrigger)
-                {
-                    foreach (var s in t.symlinks)
-                    {
-                        usings.Add(s.Value.VarName, false);
-                    }
-                }
-
                 foreach (var sect in t.sections)
                 {
                     foreach (var ex in sect.Body)
@@ -228,6 +266,17 @@ namespace questdsl
 
                 foreach (var sect in t.sections)
                 {
+                    if (sect.ProbesOr != null)
+                    {
+                        foreach (var p in sect.ProbesOr)
+                        {
+                            foreach (var varu in p.GetVarsInScope())
+                            {
+                                if (usings.ContainsKey(varu))
+                                    usings[varu] = true;
+                            }
+                        }
+                    }
                     foreach (var ex in sect.Body)
                     {
                         foreach (var varu in ex.GetVarsInScope())
