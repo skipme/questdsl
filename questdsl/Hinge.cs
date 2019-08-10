@@ -17,6 +17,15 @@ namespace questdsl
             {
                 AddNode(nodes[i]);
             }
+            InterpreterInterops = new Dictionary<string, Func<ExpressionValue[], object>>();
+            InteropNames = new SortedSet<string>();
+        }
+        public Dictionary<string, Func<questdsl.ExpressionValue[], object>> InterpreterInterops;
+        public SortedSet<string> InteropNames;
+        public void RegisterInterop(string Name, Func<questdsl.ExpressionValue[], object> InterpreterCallback)
+        {
+            InteropNames.Add(Name);
+            InterpreterInterops.Add(Name, InterpreterCallback);
         }
         public void RemoveNode(string name)
         {

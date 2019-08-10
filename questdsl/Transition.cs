@@ -11,6 +11,21 @@ namespace questdsl
         public bool IsTrigger;
         readonly bool IsChangedStates;
 
+        private bool _SkipFreezeInterpreting;
+        public bool SkipFreezeInterpreting
+        {
+            get
+            {
+                return _SkipFreezeInterpreting;
+            }
+            set
+            {
+                if (value == true && !IsTrigger)
+                    throw new Exception();
+                _SkipFreezeInterpreting = value;
+            }
+        }
+
         public Transition(string name, bool IsItTrigger
             , List<Section> sections = null
             , Dictionary<int, ExpressionSymlink> symlinks = null)

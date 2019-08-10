@@ -36,7 +36,7 @@ namespace questdsl
             CheckNullOps(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
             CheckSymlinks(h.GetTransitions(), issues);
             CheckImagesOps(h.GetTransitions().Concat(h.GetTriggers()), issues);
-            CheckVars(h, h.GetTransitions().Concat(h.GetTriggers()), issues);
+            CheckVars(h, h.GetTransitions().Concat(h.GetTriggers()), issues, h.InteropNames);
             CheckStates(h.GetStates(), h.GetTransitions().Concat(h.GetTriggers()), issues);
 
             return issues;
@@ -53,14 +53,14 @@ namespace questdsl
                 CheckImagesOps(new Transition[] { node as Transition }, issues);
 
             if (node is Transition)
-                CheckVars(h, new Transition[] { node as Transition }, issues);
+                CheckVars(h, new Transition[] { node as Transition }, issues, h.InteropNames);
 
             if (node is Transition)
                 CheckStates(h.GetStates(), new Transition[] { node as Transition }, issues);
 
             return issues;
         }
-        private static void CheckVars(Hinge h, IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues)
+        private static void CheckVars(Hinge h, IEnumerable<Transition> transitionsAndTriggers, List<LintIssue> issues, SortedSet<string> invocationNames)
         {
             foreach (var t in transitionsAndTriggers)
             {
@@ -83,7 +83,10 @@ namespace questdsl
                         if (ex.FuncType == ExpressionExecutive.ExecuteType.Invocation && ((!h.AllNodesDict.ContainsKey(ex.InvokeTransitionName)) || (!(h.AllNodesDict[ex.InvokeTransitionName] is Transition))
                             || (h.AllNodesDict[ex.InvokeTransitionName] is Transition) && (h.AllNodesDict[ex.InvokeTransitionName] as Transition).IsTrigger))
                         {
-                            issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"Invokation \"{ex.InvokeTransitionName}\" not found, or not trigger " });
+                            if (!invocationNames.Contains(ex.InvokeTransitionName))
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"Invocation \"{ex.InvokeTransitionName}\" not found, or not transition or dialogue " });
+                            }
                         }
                         if (ex.FuncType == ExpressionExecutive.ExecuteType.ToList)
                         {
