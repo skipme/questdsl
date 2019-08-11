@@ -61,7 +61,7 @@ namespace questdsl
             switch (valType)
             {
                 case ValueType.Reference:
-                    Match m = Regex.Match(left, @"^arg(-?\d+)$");
+                    Match m = Regex.Match(left, @"^arg(\d+)$");
                     if (m.Success && m.Groups[1].Success)
                     {
                         ArgOrListIndex = Int32.Parse(m.Groups[1].Value) - 1;
