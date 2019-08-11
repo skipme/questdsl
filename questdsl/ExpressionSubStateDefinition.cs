@@ -15,20 +15,44 @@ namespace questdsl
         public ExpressionValue initialValue;
         public ExpressionValue stepValue;
         public ExpressionValue runtimeValue;
-        public ExpressionSubStateDefinition(string StateName, string left, ExpressionValue right)
+
+        private ExpressionSubStateDefinition() { }
+        public static ExpressionSubStateDefinition ImageSubstate(string StateName, ExpressionValue initial)
+        {
+            ExpressionSubStateDefinition n = new ExpressionSubStateDefinition();
+            n.StateName = StateName;
+            n.SubStateName = "$image";
+            n.initialValue = initial;
+            if (initial.TypeOfValue == ExpressionValue.ValueType.StateName_SubstateRef ||
+               initial.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateRef ||
+               initial.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateName ||
+               initial.TypeOfValue == ExpressionValue.ValueType.Reference)
+            {
+                if (initial.TypeOfReference != ExpressionValue.RefType.Null && initial.TypeOfReference != ExpressionValue.RefType.Image)
+                    throw new Exception("");
+            }
+
+            return n;
+        }
+        public ExpressionSubStateDefinition(string StateName, string SubStateName, ExpressionValue initial)
         {
             this.StateName = StateName;
-            SubStateName = left;
-            initialValue = right;
+            this.SubStateName = SubStateName;
+            initialValue = initial;
             if (initialValue.TypeOfValue == ExpressionValue.ValueType.StateName_SubstateRef ||
                initialValue.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateRef ||
-               initialValue.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateName
+               initialValue.TypeOfValue == ExpressionValue.ValueType.StateRef_SubstateName ||
+               initialValue.TypeOfValue == ExpressionValue.ValueType.Reference
+
                  )
+            {
+                if (initialValue.TypeOfReference != ExpressionValue.RefType.Null)
+                    throw new Exception("");
+            }
+            if (SubStateName.Contains('.') || SubStateName.Contains('$'))
             {
                 throw new Exception("");
             }
-            if (left.Contains('.') || left.Contains('$'))
-                throw new Exception("");
         }
         public bool IsByReferenceDefined
         {

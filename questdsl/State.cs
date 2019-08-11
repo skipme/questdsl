@@ -27,6 +27,15 @@ namespace questdsl
             Substates.Add(sub);
             SubstatesBook.Add(name, sub);
         }
+        public void AddImageSubstate(ExpressionValue defaultValue)
+        {
+            ExpressionSubStateDefinition sub = ExpressionSubStateDefinition.ImageSubstate(this.Name, defaultValue);
+            if (SubstatesBook.ContainsKey(sub.SubStateName))
+                throw new Exception();
+
+            Substates.Add(sub);
+            SubstatesBook.Add(sub.SubStateName, sub);
+        }
         public void RemoveSubstate(string name)
         {
             ExpressionSubStateDefinition sub = SubstatesBook[name];

@@ -124,7 +124,7 @@ namespace questdsl
 
                         foreach (var varname in ex.GetVarsReaded())
                         {
-                            if (!assignedVars.Contains(varname) && !usings.ContainsKey(varname))
+                            if (!assignedVars.Contains(varname) && !usings.ContainsKey(varname) && varname != "image")
                             {
                                 issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = "variable " + varname + " used before assignment" });
                             }
