@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: check msbuild
     - uses: actions/checkout@master
+    - name: check msbuild    
       run: |
         C:
         cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
