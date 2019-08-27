@@ -11,6 +11,6 @@ jobs:
     - name: check msbuild
       run: |
         C:
-        cd C:\Microsoft.NET\Framework\v4.0.30319
+        cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
         dir
         msbuild
