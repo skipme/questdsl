@@ -10,9 +10,13 @@ jobs:
     steps:
     - uses: actions/checkout@master
     
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+      
     - name: Setup MSBuild.exe
       uses: warrenbuckley/Setup-MSBuild@v1
     
     - name: check msbuild    
       run: |
+        nuget restore %GITHUB_WORKSPACE%\questdsl.sln 
         msbuild %GITHUB_WORKSPACE%\questdsl.sln
