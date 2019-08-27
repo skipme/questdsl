@@ -9,9 +9,10 @@ jobs:
     
     steps:
     - uses: actions/checkout@master
+    
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+    
     - name: check msbuild    
       run: |
-        C:
-        cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
-        dir %GITHUB_WORKSPACE%
         msbuild %GITHUB_WORKSPACE%\questdsl.sln
