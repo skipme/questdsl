@@ -1,17 +1,15 @@
-name: ASP.NET Core CI
+name: .NET
 
 on: [push]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
-    - uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.2.108
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
+    - name: check msbuild
+      run: |
+        cd %windir%\Microsoft.NET\Framework\v4.0.30319
+        dir
+        msbuild
