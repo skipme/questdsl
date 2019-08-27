@@ -9,8 +9,9 @@ jobs:
     
     steps:
     - name: check msbuild
+    - uses: actions/checkout@master
       run: |
         C:
         cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
-        dir %HOME%
-        msbuild %HOME%\questdsl.sln
+        dir %GITHUB_WORKSPACE%
+        msbuild %GITHUB_WORKSPACE%\questdsl.sln
