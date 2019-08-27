@@ -12,5 +12,5 @@ jobs:
       run: |
         C:
         cd C:\Windows\Microsoft.NET\Framework\v4.0.30319
-        dir
-        msbuild
+        dir %HOME%
+        msbuild %HOME%\questdsl.sln
