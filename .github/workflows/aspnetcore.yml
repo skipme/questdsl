@@ -10,6 +10,7 @@ jobs:
     steps:
     - name: check msbuild
       run: |
-        cd %windir%\Microsoft.NET\Framework\v4.0.30319
+        C:
+        cd C:\Microsoft.NET\Framework\v4.0.30319
         dir
         msbuild
