@@ -22,4 +22,4 @@ jobs:
         msbuild %GITHUB_WORKSPACE%\questdsl.sln
     - name: tests maybe
       run: |
-        vstest.console %GITHUB_WORKSPACE%\questdsl_tests\bin\Debug\questdsl_tests.dll
+        %GITHUB_WORKSPACE%\questdsl_tests\nunit-console\nunit3-console "%GITHUB_WORKSPACE%\questdsl_tests\bin\Debug\questdsl_tests.dll"
