@@ -1,0 +1,25 @@
+name: .NET
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+      
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+    
+    - name: check msbuild    
+      run: |
+        nuget restore %GITHUB_WORKSPACE%\questdsl.sln 
+        msbuild %GITHUB_WORKSPACE%\questdsl.sln
+    - name: tests maybe
+      run: |
+        vstest.console %GITHUB_WORKSPACE%\questdsl_tests\bin\Debug\questdsl_tests.dll
