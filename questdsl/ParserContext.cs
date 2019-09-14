@@ -70,6 +70,9 @@ namespace questdsl
             }
             public void DeclareSubstate(string substateName, ExpressionValue Value)
             {
+                if (NodeDeclaredType == NodeType.Dialogue || NodeDeclaredType == NodeType.Transition || NodeDeclaredType == NodeType.Trigger)
+                    throw new Exception();
+
                 if (this.DeclaredSubstatesByList && SubStateMultiline != "$$$$$")
                     throw new Exception();
 
@@ -106,6 +109,8 @@ namespace questdsl
             }
             public void DeclareListedSubstate(ExpressionValue Value)
             {
+                if (NodeDeclaredType == NodeType.Dialogue || NodeDeclaredType == NodeType.Transition || NodeDeclaredType == NodeType.Trigger)
+                    throw new Exception();
                 if (Value == null)
                 {
                     if (SubStateMultiline != null)
@@ -160,7 +165,8 @@ namespace questdsl
                     NodeDeclaredType = NodeType.Trigger;
                 }
                 this.SectionExecutionBody = false;
-                if (NodeDeclaredType != NodeType.Transition)
+                if (NodeDeclaredType != NodeType.Transition 
+                    && NodeDeclaredType != NodeType.Dialogue)
                 {
                     NodeDeclaredType = NodeType.Trigger;
                 }

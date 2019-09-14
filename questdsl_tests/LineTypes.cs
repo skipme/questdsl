@@ -56,7 +56,8 @@ namespace questdsl_tests
             Assert.AreEqual(parser.EvaluateLineType(" > xxx    \"hey"), questdsl.Parser.LineType.dialogue_say);
             Assert.AreEqual(parser.EvaluateLineType(" > xxx    \"hey\""), questdsl.Parser.LineType.dialogue_say);
             Assert.AreEqual(parser.EvaluateLineType(" > xxx    \"hxe\"cy\""), questdsl.Parser.LineType.dialogue_say);
-
+            Assert.AreEqual(parser.EvaluateLineType("> ! \"hi"), questdsl.Parser.LineType.dialogue_say);
+            Assert.AreEqual(parser.EvaluateLineType(">! \"hi"), questdsl.Parser.LineType.dialogue_say);
 
             Assert.AreEqual(parser.EvaluateLineType("--arg9 mnemo"), questdsl.Parser.LineType.symlink);
             Assert.AreEqual(parser.EvaluateLineType(" "), questdsl.Parser.LineType.empty);
