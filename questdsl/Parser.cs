@@ -79,7 +79,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
             if (string.IsNullOrWhiteSpace(line))
                 return LineType.empty;
 
-            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(\w+)\s*$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^\s=>!<\+-]+)\s*$|^\s*([^\s=>!<\+\-\*/%]+)\s*(=|\+=|-=)\s*([^=>!<\+\-\*/%]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^\s*-->\s*([\w\.\$]*)\s*(.+)*$|^\s*([^\s=>!<\+\-\*/%]+)\s*=\s*([^=>!<\+\-\*/%]+)\s*(\+|-|\*|/|%)\s*([^=>!<\+\-\*/%]+)\s*$|^\s*>\s*([\w!_-]+)\s*(.+)\s*$");
+            Match m = Regex.Match(line, @"^\s*\\(.*)$|^\s*--\s*arg(\d+)\s*\$?(\w+)\s*$|^\s*(-{3,10})\s*$|^\s*(.*)\s*:\s*(.*)$|^\s*([^=>!<\+-]+)\s*(==|<|>|!=|>=|<=)\s*([^\s=>!<\+-]+)\s*$|^\s*([^\s=>!<\+\-\*/%]+)\s*(=|\+=|-=)\s*([^=>!<\+\-\*/%]+)\s*$|^(.*)\s*(\+\+|--)\s*$|^\s*-->\s*([\w\.\$]*)\s*(.+)*$|^\s*([^\s=>!<\+\-\*/%]+)\s*=\s*([^=>!<\+\-\*/%]+)\s*(\+|-|\*|/|%)\s*([^=>!<\+\-\*/%]+)\s*$|^\s*>\s*([\w!-_\?]+)\s*(.+)\s*$");
             if (m.Success)
             {
                 if (m.Groups[1].Success)
@@ -192,7 +192,7 @@ Test	Target String	Match()	Result()	Groups[0]	Groups[1]	Groups[2]	Groups[3]	Grou
         }
         public PartType EvaluatePartType(string line, Dictionary<string, string> parserGroups)
         {
-            Match m = Regex.Match(line, @"^\s*(\w+)\.(\w+)\s*$|^\s*(\w+)\.\$(\w+)\s*$|^\s*\$(\w+)\.(\w+)\s*$|^\s*\$(\w+)\.\$(\w+)\s*$|^\s*(-?\d+)\s*$|^\s*""(.*)""\s*$|^""(.*[^""])$|^([^""].*)""$|^\s*\$(\w+)\s*$");
+            Match m = Regex.Match(line, @"^\s*(\w+)\.(\w+)\s*$|^\s*(\w+)\.\$(\w+)\s*$|^\s*\$(\w+)\.(\w+)\s*$|^\s*\$(\w+)\.\$(\w+)\s*$|^\s*(-?\d+)\s*$|^\s*""(.*)""\s*$|^""(.*[^""])$|^([^""].*)""\s*$|^\s*\$(\w+)\s*$");
             if (m.Success)
             {
                 if (m.Groups[2].Success)

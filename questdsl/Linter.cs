@@ -80,9 +80,16 @@ namespace questdsl
                     foreach (var ex in sect.Body)
                     {
 
-                        if (ex.FuncType == ExpressionExecutive.ExecuteType.Invocation && ((!h.AllNodesDict.ContainsKey(ex.InvokeTransitionName)) || (!(h.AllNodesDict[ex.InvokeTransitionName] is Transition))
+                        if (ex.FuncType == ExpressionExecutive.ExecuteType.Invocation
+                            && ((!h.AllNodesDict.ContainsKey(ex.InvokeTransitionName))
+                            || (!(h.AllNodesDict[ex.InvokeTransitionName] is Transition) && (!(h.AllNodesDict[ex.InvokeTransitionName] is Dialogue)))
                             || (h.AllNodesDict[ex.InvokeTransitionName] is Transition) && (h.AllNodesDict[ex.InvokeTransitionName] as Transition).IsTrigger))
                         {
+                            if (ex.InvokeTransitionName == "say" && !(t is Dialogue))
+                            {
+                                issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"say proc allowed only in dialogues " });
+                            }
+                            else
                             if (!invocationNames.Contains(ex.InvokeTransitionName))
                             {
                                 issues.Add(new LintIssue { IssueType = LintIssueType.error, LineNumber = ex.LineNumber, Message = $"Invocation \"{ex.InvokeTransitionName}\" not found, or not transition or dialogue " });
@@ -176,10 +183,15 @@ namespace questdsl
                         checkVal(ex.ExRightPart, ex.LineNumber);
 
                         if (ex.InvokeArgs != null)
-                            foreach (var item in ex.InvokeArgs)
+                        {
+                            if (ex.InvokeTransitionName != "say" && t is Dialogue)
                             {
-                                checkVal(item, ex.LineNumber);
+                                foreach (var item in ex.InvokeArgs)
+                                {
+                                    checkVal(item, ex.LineNumber);
+                                }
                             }
+                        }
                     }
                 }
             }

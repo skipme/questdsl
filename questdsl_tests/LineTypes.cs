@@ -20,6 +20,7 @@ namespace questdsl_tests
             Assert.AreEqual(parser.EvaluatePartType("\"stri\"ng\""), questdsl.Parser.PartType.text_multiline);
             Assert.AreEqual(parser.EvaluatePartType("\"string xxx"), questdsl.Parser.PartType.text_multiline_start);
             Assert.AreEqual(parser.EvaluatePartType("3xxx string\""), questdsl.Parser.PartType.text_multiline_end);
+            Assert.AreEqual(parser.EvaluatePartType("3xxx string\" "), questdsl.Parser.PartType.text_multiline_end);
             Assert.AreEqual(parser.EvaluatePartType("234235346546"), questdsl.Parser.PartType.digit);
 
             Dictionary<string, string> groups = new Dictionary<string, string>();
@@ -58,6 +59,7 @@ namespace questdsl_tests
             Assert.AreEqual(parser.EvaluateLineType(" > xxx    \"hxe\"cy\""), questdsl.Parser.LineType.dialogue_say);
             Assert.AreEqual(parser.EvaluateLineType("> ! \"hi"), questdsl.Parser.LineType.dialogue_say);
             Assert.AreEqual(parser.EvaluateLineType(">! \"hi"), questdsl.Parser.LineType.dialogue_say);
+            Assert.AreEqual(parser.EvaluateLineType(">? ..."), questdsl.Parser.LineType.dialogue_say);
 
             Assert.AreEqual(parser.EvaluateLineType("--arg9 mnemo"), questdsl.Parser.LineType.symlink);
             Assert.AreEqual(parser.EvaluateLineType(" "), questdsl.Parser.LineType.empty);

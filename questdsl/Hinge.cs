@@ -43,6 +43,9 @@ namespace questdsl
         }
         public void RenameNode(string name, string newName)
         {
+            if (newName == "say")
+                throw new Exception();
+
             if (AllNodesDict.ContainsKey(newName) || !AllNodesDict.ContainsKey(name))
                 throw new Exception();
 
@@ -58,6 +61,9 @@ namespace questdsl
         }
         public string AddNode(State node)
         {
+            if (node.Name == "say")
+                throw new Exception();
+
             if (AllNodesDict.ContainsKey(node.Name))
                 throw new Exception();
 

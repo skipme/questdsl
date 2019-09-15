@@ -6,20 +6,16 @@ using System.Threading.Tasks;
 
 namespace questdsl
 {
-    public class Dialogue : State
+    public class Dialogue : Transition
     {
         readonly bool IsChangedStates;
 
         public Dialogue(string name
             , List<Section> sections = null
             , Dictionary<int, ExpressionSymlink> symlinks = null)
-            : base(name)
+            : base(name, false, sections, symlinks)
         {
-            this.sections = sections ?? new List<Section>();
-            this.symlinks = symlinks ?? new Dictionary<int, ExpressionSymlink>();
         }
-        public Dictionary<int, ExpressionSymlink> symlinks;
-        public List<Section> sections;
 
         public override bool SubStateModifies => IsChangedStates;
 
@@ -27,7 +23,5 @@ namespace questdsl
         {
             throw new NotImplementedException();
         }
-
-
     }
 }
